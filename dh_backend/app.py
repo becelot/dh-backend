@@ -1,7 +1,6 @@
 from typing import Type
 
 from flask import Flask
-from flask_migrate import Migrate
 
 from dh_backend.config import Config, DevelopmentConfig
 
