@@ -17,7 +17,6 @@ class DhBackend(Flask):
         from dh_backend.models import db
 
         db.init_app(self)
-        Migrate(self, db)
 
 
 def create_app(*args, **kw):
