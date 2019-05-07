@@ -17,8 +17,14 @@ class DhBackend(Flask):
 
         db.init_app(self)
 
+    def add_logger(self):
+        from .logging import logger
+
+        logger.init_app(self)
+
 
 def create_app(*args, **kw):
     backend = DhBackend(*args, **kw)
     backend.add_sqlalchemy()
+    backend.add_logger()
     return backend
