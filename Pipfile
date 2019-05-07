@@ -4,6 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
+faker = "*"
+pytest-cov = "*"
+pytest-pep8 = "*"
+flake8 = "*"
 
 [packages]
 flask = "*"
@@ -12,11 +17,7 @@ flask-restful = "*"
 flask-migrate = "*"
 flask-script = "*"
 psycopg2 = "*"
-pytest = "*"
-faker = "*"
-pytest-cov = "*"
-pytest-pep8 = "*"
-flake8 = "*"
+
 
 [requires]
 python_version = "3.7"

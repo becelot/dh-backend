@@ -16,6 +16,6 @@ before_script:
 install:
   - pipenv install --dev
 script:
-  - pipenv run pytest -vv --color=yes --cov=dh_backend --cov-report term-missing:skip-covered ./tests
+  - pipenv run pytest -vv --color=yes --cov=dh_backend --cov-report term-missing:skip-covered
 after_success:
   - coveralls
