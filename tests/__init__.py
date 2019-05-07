@@ -31,8 +31,8 @@ def _db_drop_all_force(db):
                 continue
             fks.append(
                 ForeignKeyConstraint((), (), name=fk['name'])
-                )
-        t = Table(table_name,metadata,*fks)
+            )
+        t = Table(table_name, metadata, *fks)
         tbs.append(t)
         all_fks.extend(fks)
 

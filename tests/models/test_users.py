@@ -43,6 +43,3 @@ def test_user_delete(db_session):
     db_session.delete(user)
 
     assert db_session.query(User).filter_by(user_name="admin").first() is None
-
-
-
