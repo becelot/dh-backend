@@ -2,7 +2,7 @@ from typing import Type
 
 from flask import Flask
 
-from dh_backend.config import Config, DevelopmentConfig
+from dh_backend.config import Config, DevelopmentConfig, TestConfig
 
 
 class DhBackend(Flask):
@@ -28,3 +28,7 @@ def create_app(*args, **kw):
     backend.add_sqlalchemy()
     backend.add_logger()
     return backend
+
+
+def create_test_app():
+    return create_app(config=TestConfig)

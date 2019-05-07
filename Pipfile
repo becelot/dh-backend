@@ -12,6 +12,8 @@ flask-restful = "*"
 flask-migrate = "*"
 flask-script = "*"
 psycopg2 = "*"
+pytest = "*"
+faker = "*"
 
 [requires]
 python_version = "3.7"
