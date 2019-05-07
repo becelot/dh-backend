@@ -1,2 +1,2 @@
-# dh-backend
-The backend for the Deck Histories application
+# Deck Histories Backend
+The backend for the Deck Histories application.
