@@ -2,11 +2,11 @@ dist: xenial
 language: python
 python: "3.7"
 addons:
-  postgresql: "11"
+  postgresql: "10"
   apt:
     packages:
-      - postgresql-11
-      - postgresql-client-11
+      - postgresql-10
+      - postgresql-client-10
 services:
   - postgresql
 before_install:
@@ -16,4 +16,4 @@ before_script:
 install:
   - pipenv install --dev
 script:
-  - pipevn run pytest ./tests
+  - pipenv run pytest -vv --color=yes --cov=dh_backend --cov-report term-missing:skip-covered ./tests
