@@ -1,0 +1,46 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/backend
+    docker:
+      - image: circleci/python:3.7.2
+        environment:
+          PIPENV_VENV_IN_PROJECT: true
+      - image: circleci/postgres:9.6.9
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: testdb
+    steps:
+      - checkout
+      - run:
+          name: Taking control of cache
+          command: |
+            sudo chown -R circleci:circleci /usr/local/bin
+            sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - restore_cache:
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            sudo pip install pipenv coveralls
+            pipenv install --dev
+      - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          paths:
+            - ".venv"
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.7/site-packages"
+      - run:
+          name: Running tests
+          command: |
+            mkdir test-reports
+            pipenv run pytest -vv --color=yes --cov=dh_backend --cov-report term-missing:skip-covered --junitxml=test-results/junit.xml --html=test-results/report.html
+      - run:
+          name: Uploading coverage results
+          command: |
+            coveralls
+      - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: test-results
+      - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: test-results
+          destination: tr1

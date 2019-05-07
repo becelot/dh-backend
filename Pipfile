@@ -8,6 +8,7 @@ pytest = "*"
 faker = "*"
 pytest-cov = "*"
 pytest-pep8 = "*"
+pytest-html = "*"
 flake8 = "*"
 
 [packages]
