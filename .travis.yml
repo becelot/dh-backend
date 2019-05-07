@@ -1,0 +1,19 @@
+dist: xenial
+language: python
+python: "3.7"
+addons:
+  postgresql: "11"
+  apt:
+    packages:
+      - postgresql-11
+      - postgresql-client-11
+services:
+  - postgresql
+before_install:
+  - pip install pipenv pytest
+before_script:
+  - psql -c 'CREATE DATABASE testdb;' -U postgres
+install:
+  - pipenv install --dev
+script:
+  - pipevn run pytest ./tests

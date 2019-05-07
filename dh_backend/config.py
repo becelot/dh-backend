@@ -12,13 +12,13 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI: str = 'postgresql://postgres:roottoor@127.0.0.1:5432/devdb'
+    SQLALCHEMY_DATABASE_URI: str = 'postgresql://postgres@127.0.0.1:5432/devdb'
     LOG_FILE: str = 'backend.log'
     DEBUG = True
 
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI: str = 'postgresql://postgres:roottoor@127.0.0.1:5432/testdb'
+    SQLALCHEMY_DATABASE_URI: str = 'postgresql://postgres@127.0.0.1:5432/testdb'
     DEBUG = True
     TESTING = True
 
