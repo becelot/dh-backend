@@ -10,10 +10,12 @@ addons:
 services:
   - postgresql
 before_install:
-  - pip install pipenv pytest
+  - pip install pipenv pytest coveralls
 before_script:
   - psql -c 'CREATE DATABASE testdb;' -U postgres
 install:
   - pipenv install --dev
 script:
   - pipenv run pytest -vv --color=yes --cov=dh_backend --cov-report term-missing:skip-covered ./tests
+after_success:
+  - coveralls
