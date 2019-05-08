@@ -17,7 +17,14 @@ class DhBackend(Flask):
 
         db.init_app(self)
 
+    def add_restul_api(self):
+        """Registers the URL endpoints of the RESTful API"""
+        from dh_backend.api import load_api
+
+        load_api(self)
+
     def add_logger(self):
+        """Add a logger to the application"""
         from .logging import logger
 
         logger.init_app(self)
@@ -27,6 +34,7 @@ def create_app(*args, **kw):
     backend = DhBackend(*args, **kw)
     backend.add_sqlalchemy()
     backend.add_logger()
+    backend.add_restul_api()
     return backend
 
 

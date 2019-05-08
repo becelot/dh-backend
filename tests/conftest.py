@@ -33,3 +33,8 @@ def db_session(db, app):
         clean_db()
         yield db.session
         db.session.rollback()
+
+
+@pytest.fixture(scope="function")
+def client(app):
+    yield app.test_client()
