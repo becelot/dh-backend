@@ -10,3 +10,4 @@ class User(db.Model):
     twitch_name = db.Column(db.String, nullable=True)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
+    recent_decks = db.relationship("RecentDeck", uselist=False, back_populates="user", cascade="all,delete")
