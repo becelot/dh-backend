@@ -36,5 +36,5 @@ def db_session(db, app):
 
 
 @pytest.fixture(scope="function")
-def client(app):
+def client(app, db_session):
     yield app.test_client()

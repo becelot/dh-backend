@@ -1,3 +1,5 @@
+import re
+
 from flask import request
 from flask_restful import Resource
 
@@ -12,7 +14,11 @@ class RegisterUser(Resource):
     """
     def post(self):
         data = request.get_json()
-        username = data["username"]
+        username: str = data["username"]
+
+        pattern = re.compile("^[a-zA-Z0-9]{4,24}$")
+        if not pattern.match(username):
+            return {"message": "User name invalid", "status": 501}
 
         user = User.query.filter_by(user_name=username).first()
         if user:
