@@ -43,3 +43,18 @@ def test_user_delete(db_session):
     db_session.delete(user)
 
     assert db_session.query(User).filter_by(user_name="admin").first() is None
+
+
+def test_user_recent_decks(db_session):
+    user = test_user()
+    db_session.add(user)
+    db_session.commit()
+
+    assert user.recent_decks is None
+
+    from dh_backend.models import RecentDeck
+    recent = RecentDeck(user=user)
+    db_session.add(recent)
+    db_session.commit()
+
+    assert user.recent_decks is not None
