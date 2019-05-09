@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6e464e5df50d3fead231ebb910ca4636df2d9bbc14050139b3e200fff05c0996"
+            "sha256": "b83bd6d25ab74aa929ab936a555499442c68bdccc73deb13e5f420716250102f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -81,6 +81,22 @@
             ],
             "index": "pypi",
             "version": "==2.4.0"
+        },
+        "hearthstone": {
+            "hashes": [
+                "sha256:25ce99973507f0991dd69ea7c21e60b404003a50d32398ca4471177dc1392b92",
+                "sha256:d786d7de32d00d4a7e14018cfe1fd2e792e978d8c00d457c6039d5d32ab3cb50"
+            ],
+            "index": "pypi",
+            "version": "==5.5.0"
+        },
+        "hearthstone-data": {
+            "hashes": [
+                "sha256:0f69274131ee1bceda031a4622ceef8f3e72581eeec64c930f1ddaa2d4cc568d",
+                "sha256:1ab1ffd8a9cfcb22bc2960f42c0fdc78dd7cbe86996538f4426d3fe2edd935cc"
+            ],
+            "index": "pypi",
+            "version": "==30103.2"
         },
         "itsdangerous": {
             "hashes": [

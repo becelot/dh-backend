@@ -19,6 +19,8 @@ flask-migrate = "*"
 flask-script = "*"
 psycopg2 = "*"
 flask-jwt-extended = "*"
+hearthstone = "*"
+hearthstone-data = "*"
 
 [requires]
 python_version = "3.7"
