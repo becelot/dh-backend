@@ -1,4 +1,4 @@
-from dh_backend.models import db
+from dh_backend.models import db, RecentDeck
 
 
 class User(db.Model):
@@ -10,4 +10,4 @@ class User(db.Model):
     twitch_name = db.Column(db.String, nullable=True)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
-    recent_decks = db.relationship("RecentDeck", uselist=False, back_populates="user", cascade="all,delete")
+    recent_decks: RecentDeck = db.relationship("RecentDeck", uselist=False, back_populates="user", cascade="all,delete")

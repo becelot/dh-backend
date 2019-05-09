@@ -1,4 +1,4 @@
-from dh_backend.models import db
+from dh_backend.models import db, Deck
 
 
 class RecentDeck(db.Model):
@@ -11,7 +11,7 @@ class RecentDeck(db.Model):
     user = db.relationship("User", back_populates="recent_decks")
 
     current_deck_id = db.Column(db.Integer, db.ForeignKey("Deck.id"), nullable=True)
-    current_deck = db.relationship("Deck", foreign_keys=[current_deck_id])
+    current_deck: Deck = db.relationship("Deck", foreign_keys=[current_deck_id])
 
     previous_deck_id = db.Column(db.Integer, db.ForeignKey("Deck.id"), nullable=True)
     previous_deck = db.relationship("Deck", foreign_keys=[previous_deck_id])

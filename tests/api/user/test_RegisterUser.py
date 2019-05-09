@@ -12,7 +12,7 @@ def test_register_user(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert register.json["status"] == 200
+    assert register.json["status"] == 201
 
 
 def test_register_already_registered(client: FlaskClient):
@@ -24,7 +24,7 @@ def test_register_already_registered(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert register.json["status"] == 200
+    assert register.json["status"] == 201
 
     register = client.post('/api/user/register',
                            data=json.dumps({
@@ -34,7 +34,7 @@ def test_register_already_registered(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert register.json["status"] == 500
+    assert register.json["status"] == 422
 
 
 def test_username_invalid(client: FlaskClient):
@@ -46,4 +46,4 @@ def test_username_invalid(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert register.json["status"] == 501
+    assert register.json["status"] == 400

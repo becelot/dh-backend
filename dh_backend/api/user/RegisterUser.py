@@ -18,14 +18,14 @@ class RegisterUser(Resource):
 
         pattern = re.compile("^[a-zA-Z0-9]{4,24}$")
         if not pattern.match(username):
-            return {"message": "User name invalid", "status": 501}
+            return {"status": 400, "message": "The username has an invalid format."}
 
         user = User.query.filter_by(user_name=username).first()
         if user:
-            return {"message": "User already exists", "status": 500}
+            return {"message": "The username already exists.", "status": 422}
 
         new_user = User(user_name=username, password=data["password"], email=data["email"])
         db.session.add(new_user)
         db.session.commit()
 
-        return {"message": "User successfully registered", "status": 200}
+        return {"message": "User was successfully registered", "status": 201}

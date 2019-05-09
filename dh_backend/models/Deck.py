@@ -1,4 +1,4 @@
-from dh_backend.models import db
+from dh_backend.models import db, DeckVersion
 
 
 class Deck(db.Model):
@@ -7,7 +7,10 @@ class Deck(db.Model):
 
     id = db.Column(db.Integer, unique=True, primary_key=True, autoincrement=True)
     current_version_id = db.Column(db.Integer, db.ForeignKey("DeckVersion.id", ondelete="SET NULL"), nullable=True)
-    current_version = db.relationship("DeckVersion", uselist=False, foreign_keys=[current_version_id], post_update=True)
+    current_version: DeckVersion = db.relationship("DeckVersion",
+                                                   uselist=False,
+                                                   foreign_keys=[current_version_id],
+                                                   post_update=True)
 
     versions = db.relationship("DeckVersion", primaryjoin="Deck.id==DeckVersion.deck_id", post_update=True,
                                cascade="all,delete", lazy="dynamic")

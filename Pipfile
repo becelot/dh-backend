@@ -18,7 +18,7 @@ flask-restful = "*"
 flask-migrate = "*"
 flask-script = "*"
 psycopg2 = "*"
-
+flask-jwt-extended = "*"
 
 [requires]
 python_version = "3.7"
