@@ -1,8 +1,11 @@
+import binascii
+
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from flask_restful import reqparse
 
-from dh_backend.models import User, Deck
+from dh_backend.models import User, Deck, DeckVersion
+from hearthstone.deckstrings import Deck as DeckData
 
 
 class UploadDeck(Resource):
@@ -28,7 +31,37 @@ class UploadDeck(Resource):
         if user is None:
             return {'status': 401, 'message': 'The username could not be verified'}, 401
 
-        # Get current deck of the user and check, if they are the same
+        # Validate new deckcode
+        deckcode: str = args.get("deckstring")
+        try:
+            new_deck = DeckData.from_deckstring(deckcode)
+        except ValueError or binascii.Error:
+            return {'status': 400, 'message': 'Invalid deck string'}
+
+        # Try to compare to current deck
         deck: Deck = user.recent_decks.current_deck
-        if deck.current_version.deck_code == args.get("deckstring"):
-            return {'status': 422, 'message': 'Deck was already uploaded'}
+        if deck:
+
+            # Get most recent version
+            current_version: DeckVersion = deck.current_version
+            if current_version:
+
+                # If they are the same, then cancel
+                if current_version.deck_code == deckcode:
+                    return {'status': 422, 'message': 'Deck was already uploaded'}
+
+                # compare the two deck lists
+                current_deck: DeckData = DeckData.from_deckstring(current_version.deck_code)
+                self.significant_change(new_deck, current_deck)
+
+    @staticmethod
+    def significant_change(new_deck: DeckData, old_deck: DeckData) -> bool:
+        """Detect if the two provided decks differ by a significant amount"""
+
+        # First, check if the classes match
+        from flask import current_app
+        hs = current_app.hearthstone_db
+
+        if hs[new_deck.heroes[0]].card_class != hs[new_deck.heroes[1]]:
+            return True
+        return True

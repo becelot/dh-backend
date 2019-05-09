@@ -7,6 +7,8 @@ deck = Deck.from_deckstring("AAECAf0ECsUE7QWQB+wHvwj7DKCAA6aHA8CYA4qeAwpNigG7Ask
 deckId = deck.get_dbf_id_list()
 dbf_db, _ = cardxml.load_dbf()
 
+print(deck.heroes[0])
+print(dbf_db[deck.heroes[0]].card_class)
 print(dbf_db[deckId[0][0]].card_id)
 
 if __name__ == '__main__':

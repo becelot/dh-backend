@@ -10,6 +10,7 @@ class DhBackend(Flask):
         super(DhBackend, self).__init__(name, *args, **kw)
 
         self.config.from_object(config)
+        self.load_resources()
 
     def add_sqlalchemy(self):
         """ Create and configure SQLAlchemy extension """
@@ -28,6 +29,12 @@ class DhBackend(Flask):
         from .logging import logger
 
         logger.init_app(self)
+
+    def load_resources(self):
+        """Load additional resources into memory"""
+        from .lib.hearthstone import HearthstoneAPI
+
+        HearthstoneAPI.init_app(self)
 
 
 def create_app(*args, **kw):
