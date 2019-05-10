@@ -1,3 +1,3 @@
-from .hearthstone_api import HearthstoneAPI
+from .hearthstone_api import init_app
 
-__all__ = ["HearthstoneAPI"]
+__all__ = ["init_app"]

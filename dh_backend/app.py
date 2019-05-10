@@ -32,9 +32,9 @@ class DhBackend(Flask):
 
     def load_resources(self):
         """Load additional resources into memory"""
-        from .lib.hearthstone import HearthstoneAPI
+        from dh_backend.lib import hearthstone
 
-        HearthstoneAPI.init_app(self)
+        hearthstone.init_app(app=self)
 
 
 def create_app(*args, **kw):

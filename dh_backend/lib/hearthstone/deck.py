@@ -1,10 +1,18 @@
 import binascii
-from typing import Optional
+from typing import Optional, List
 
 from hearthstone.deckstrings import Deck
+from hearthstone.enums import CardClass, CardType
+
+from dh_backend.lib.hearthstone.card import HearthstoneCard
+from dh_backend.lib.hearthstone.hearthstone_api import get_card
 
 
 class HSDeckParserException(Exception):
+    pass
+
+
+class HSDeckNoHeroException(Exception):
     pass
 
 
@@ -12,7 +20,7 @@ class HearthstoneDeck(Deck):
     def __init__(self, deck: Optional[Deck] = None):
         super(HearthstoneDeck, self).__init__()
         if deck:
-            self.heroes = deck.heroes
+            self.heroes: List[int] = deck.heroes
             self.cards = deck.cards
             self.format = deck.format
 
@@ -29,6 +37,16 @@ class HearthstoneDeck(Deck):
             return cls.from_deckstring(deckcode)
         except ValueError or binascii.Error:
             raise HSDeckParserException("Error while parsing deckcode")
+
+    def get_hero_class(self) -> CardClass:
+        """Get the class associated with the deck"""
+        hero_id = self.heroes[0]
+        hero: HearthstoneCard = get_card(hero_id)
+
+        if hero.get_type() != CardType.HERO:
+            return None
+
+        return hero.card_class
 
     def compare(self, other, threshold=60):
         """
