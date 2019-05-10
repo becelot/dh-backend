@@ -1,11 +1,9 @@
-import binascii
-
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 from flask_restful import reqparse
 
+from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
 from dh_backend.models import User, Deck, DeckVersion
-from hearthstone.deckstrings import Deck as DeckData
 
 
 class UploadDeck(Resource):
@@ -34,8 +32,8 @@ class UploadDeck(Resource):
         # Validate new deckcode
         deckcode: str = args.get("deckstring")
         try:
-            new_deck = DeckData.from_deckstring(deckcode)
-        except ValueError or binascii.Error:
+            new_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(deckcode)
+        except HSDeckParserException:
             return {'status': 400, 'message': 'Invalid deck string'}
 
         # Try to compare to current deck
@@ -51,11 +49,11 @@ class UploadDeck(Resource):
                     return {'status': 422, 'message': 'Deck was already uploaded'}
 
                 # compare the two deck lists
-                current_deck: DeckData = DeckData.from_deckstring(current_version.deck_code)
+                current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
                 self.significant_change(new_deck, current_deck)
 
     @staticmethod
-    def significant_change(new_deck: DeckData, old_deck: DeckData) -> bool:
+    def significant_change(new_deck: HearthstoneDeck, old_deck: HearthstoneDeck) -> bool:
         """Detect if the two provided decks differ by a significant amount"""
 
         # First, check if the classes match
