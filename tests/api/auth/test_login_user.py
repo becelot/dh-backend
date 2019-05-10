@@ -15,3 +15,27 @@ def test_login(db_session, client: FlaskClient):
                            content_type='application/json')
 
     assert response.json['status'] == 200
+
+
+def test_username_too_short(client):
+    response = client.post('/api/auth/login',
+                           data=json.dumps({'username': 'te', 'password': '1234'}),
+                           content_type='application/json')
+
+    assert response.json['status'] == 400
+
+
+def test_username_too_long(client):
+    response = client.post('/api/auth/login',
+                           data=json.dumps({'username': 'tdeaetdeaetdeaetdeaetdeae', 'password': '1234'}),
+                           content_type='application/json')
+
+    assert response.json['status'] == 400
+
+
+def test_username_invalid(client):
+    response = client.post('/api/auth/login',
+                           data=json.dumps({'username': 'tested_dw', 'password': '1234'}),
+                           content_type='application/json')
+
+    assert response.json['status'] == 400
