@@ -9,7 +9,8 @@ class Logger(object):
 
     def init_app(self, app: Flask):
         formatter = RequestFormatter(
-            "%(asctime)s %(remote_addr)s: requested %(url)s: %(levelname)s in [%(module)s: %(lineno)d]: %(message)s"
+            "%(asctime)s %(remote_addr)s: requested %(url)s: %(levelname)s in [%(module)s: %(lineno)d]: %(message)s",
+            "%(asctime)s: %(levelname)s in [%(funcName)s: %(filename)s@%(lineno)d]: %(message)s"
         )
         if app.config.get("LOG_FILE"):
             fh = logging.FileHandler(app.config.get("LOG_FILE"))
