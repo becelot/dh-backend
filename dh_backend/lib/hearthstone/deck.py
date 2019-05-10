@@ -4,8 +4,8 @@ from typing import Optional, List
 from hearthstone.deckstrings import Deck
 from hearthstone.enums import CardClass, CardType
 
+from dh_backend.lib.hearthstone import get_card
 from dh_backend.lib.hearthstone.card import HearthstoneCard
-from dh_backend.lib.hearthstone.hearthstone_api import get_card
 
 
 class HSDeckParserException(Exception):
@@ -38,7 +38,7 @@ class HearthstoneDeck(Deck):
         except ValueError or binascii.Error:
             raise HSDeckParserException("Error while parsing deckcode")
 
-    def get_hero_class(self) -> CardClass:
+    def get_hero_class(self) -> Optional[CardClass]:
         """Get the class associated with the deck"""
         hero_id = self.heroes[0]
         hero: HearthstoneCard = get_card(hero_id)
