@@ -1,5 +1,5 @@
 import binascii
-from typing import Optional, List
+from typing import Optional, List, Tuple, Iterator
 
 from hearthstone.deckstrings import Deck
 from hearthstone.enums import CardClass, CardType
@@ -38,15 +38,32 @@ class HearthstoneDeck(Deck):
         except ValueError or binascii.Error:
             raise HSDeckParserException("Error while parsing deckcode")
 
-    def get_hero_class(self) -> Optional[CardClass]:
+    def get_hero_class(self) -> CardClass:
         """Get the class associated with the deck"""
         hero_id = self.heroes[0]
         hero: HearthstoneCard = get_card(hero_id)
 
         if hero.get_type() != CardType.HERO:
-            return None
+            return CardClass.INVALID
 
         return hero.card_class
+
+    def get_real_cards(self) -> Iterator[Tuple[HearthstoneCard, int]]:
+        """
+        Transform the cardid list into a list containing real cards
+        :return: A list containing references to actual hearthstone cards
+        """
+        return map(lambda x: (get_card(x[0]), x[1]), self.get_dbf_id_list())
+
+    def get_cards_in_deck_order(self) -> Iterator[Tuple[HearthstoneCard, int]]:
+        """
+        Get the cards in deck order. Sort it first on name, then on cost.
+        :return: A deck in display deck order
+        """
+        return sorted(
+            sorted(self.get_real_cards(), key=lambda x: x[0].name),
+            key=lambda x: x[0].cost
+        )
 
     def compare(self, other, threshold=60):
         """

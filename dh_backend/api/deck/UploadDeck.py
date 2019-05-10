@@ -53,13 +53,18 @@ class UploadDeck(Resource):
                 self.significant_change(new_deck, current_deck)
 
     @staticmethod
-    def significant_change(new_deck: HearthstoneDeck, old_deck: HearthstoneDeck) -> bool:
-        """Detect if the two provided decks differ by a significant amount"""
+    def significant_change(deck_1: HearthstoneDeck, deck_2: HearthstoneDeck, threshold: int = 5) -> bool:
+        """
+        Detect if the two provided decks differ by a significant amount
+        :param deck_1: The first deck to compare
+        :param deck_2: The deck that the first one is compared to
+        :param threshold: The threshold used to determine if decks differ significantly. Defaults to 5.
+        :return true iff the decks differs in threshold cards
+        """
 
         # First, check if the classes match
-        from flask import current_app
-        hs = current_app.hearthstone_db
+        if deck_1.get_hero_class() != deck_2.get_hero_class():
+            return False
 
-        if hs[new_deck.heroes[0]].card_class != hs[new_deck.heroes[1]]:
-            return True
-        return True
+        # if the decks differ in at most threshold cards
+        return deck_1.compare(deck_2, threshold+1) > threshold
