@@ -10,7 +10,6 @@ class DhBackend(Flask):
         super(DhBackend, self).__init__(name, *args, **kw)
 
         self.config.from_object(config)
-        self.load_resources()
 
     def add_sqlalchemy(self):
         """ Create and configure SQLAlchemy extension """
@@ -42,6 +41,7 @@ def create_app(*args, **kw):
     backend.add_sqlalchemy()
     backend.add_logger()
     backend.add_restul_api()
+    backend.load_resources()
     return backend
 
 
