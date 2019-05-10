@@ -35,6 +35,12 @@ class DhBackend(Flask):
 
         hearthstone.init_app(app=self)
 
+    def add_auth(self):
+        """Add authentication to application"""
+        from flask_jwt_extended import JWTManager
+
+        JWTManager(self)
+
 
 def create_app(*args, **kw):
     backend = DhBackend(*args, **kw)
@@ -42,6 +48,7 @@ def create_app(*args, **kw):
     backend.add_logger()
     backend.add_restul_api()
     backend.load_resources()
+    backend.add_auth()
     return backend
 
 

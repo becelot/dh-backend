@@ -8,6 +8,7 @@ class Config:
     SECRET_KEY: str = 'dhistory'
     SQLALCHEMY_DATABASE_URI: str = 'undefined'
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
+    JWT_SECRET_KEY: str = 'geRgaDdHsi iK04hjFfDDsgEf Ldad Hearthstone'
     DEBUG: bool = True
 
 
