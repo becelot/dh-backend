@@ -1,11 +1,12 @@
 import secrets
+
 from dh_backend.models import db, RecentDeck
 
 
 def generate_new_key():
     new_key: str = secrets.token_urlsafe(98)
     while User.query.filter_by(api_key=new_key).first() is not None:
-        new_key = secrets.token_urlsafe(98)
+        new_key = secrets.token_urlsafe(98)  # pragma: no cover
 
     return new_key
 
