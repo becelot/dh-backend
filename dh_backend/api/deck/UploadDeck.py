@@ -1,10 +1,17 @@
-from typing import List
+from enum import IntEnum
+from typing import List, Optional, Iterable
 
 from flask_restful import Resource
 from flask_restful import reqparse
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
 from dh_backend.models import User, Deck, DeckVersion, db
+
+
+class DeckMatch(IntEnum):
+    NO_MATCH = 0
+    INEXACT_MATCH = 1
+    EXACT_MATCH = 2
 
 
 class UploadDeck(Resource):
@@ -38,16 +45,78 @@ class UploadDeck(Resource):
             return {'status': 400, 'message': 'Invalid deck string'}
 
         # Try to compare to most recent decks
-        decks: List[Deck] = [
+        recent_decks: List[Deck] = [
             user.recent_decks.current_deck,
             user.recent_decks.previous_deck,
             user.recent_decks.deck_3,
             user.recent_decks.deck_4,
             user.recent_decks.deck_5,
         ]
-        for deck in decks:
 
-            # if deck is available
+        deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, recent_decks)
+
+        if deck_match == DeckMatch.EXACT_MATCH:
+            if deck_result == user.recent_decks.current_deck:
+                return {'status': 422, 'message': 'Deck was already uploaded'}
+            else:  # deck matched exact, but is not the currently used deck
+                user.recent_decks.set_recent_deck(deck_result)
+                db.session.commit()
+
+                return {'status': 200, 'message': 'Deck uploaded successfully'}
+        elif deck_match == DeckMatch.INEXACT_MATCH:
+            # create a new version for the deck
+            version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck_result)
+            db.session.add(version)
+            db.session.commit()
+
+            deck_result.current_version = version
+            user.recent_decks.set_recent_deck(deck_result)
+            db.session.commit()
+
+            # and return success message
+            return {'status': 200, 'message': 'Deck uploaded successfully'}
+
+        # deck was not recently played, so retrieve all other decks that the user has played
+        deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, user.decks)
+        if deck_match == DeckMatch.EXACT_MATCH:
+            user.recent_decks.set_recent_deck(deck_result)
+            db.session.commit()
+
+            return {'status': 200, 'message': 'Deck uploaded successfully'}
+        elif deck_match == DeckMatch.INEXACT_MATCH:
+            # create a new version for the deck
+            version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck_result)
+            db.session.add(version)
+            db.session.commit()
+
+            deck_result.current_version = version
+            user.recent_decks.set_recent_deck(deck_result)
+            db.session.commit()
+
+            # and return success message
+            return {'status': 200, 'message': 'Deck uploaded successfully'}
+
+        # it is a completely new archetype that the user has not played before
+        deck = Deck(user=user)
+        db.session.add(deck)
+        db.session.commit()
+
+        version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck)
+        db.session.add(version)
+        db.session.commit()
+
+        user.recent_decks.set_recent_deck(deck)
+        db.session.commit()
+
+        return {'status': 200, 'message': 'Deck uploaded successfully'}
+
+    @staticmethod
+    def update_with_deck_info(deck: HearthstoneDeck, resource: Deck):
+        pass
+
+    @staticmethod
+    def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
+        for deck in decks:
             if deck:
 
                 # Get most recent version of the deck
@@ -55,21 +124,16 @@ class UploadDeck(Resource):
                 if current_version:
 
                     # If they are the same, then cancel
-                    if current_version.deck_code == deckcode:
-                        return {'status': 422, 'message': 'Deck was already uploaded'}
+                    if current_version.deck_code == new_deck.deckcode:
+                        return DeckMatch.EXACT_MATCH, deck
 
                     # compare the two deck lists for similarity
                     current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
-                    if not UploadDeck.significant_change(new_deck, current_deck):
+                    if not UploadDeck.significant_change(deck, current_deck):
                         # if the decks are not the same, but similar enough, create a new version for the deck
-                        version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck)
-                        db.session.add(version)
-                        db.session.commit()
+                        return DeckMatch.INEXACT_MATCH, deck
 
-                        # and return success message
-                        return {'status': 200, 'message': 'Deck uploaded successfully'}
-
-            # deck was not recently played, so retrieve all other decks that the user has played
+        return DeckMatch.NO_MATCH, None
 
     @staticmethod
     def significant_change(deck_1: HearthstoneDeck, deck_2: HearthstoneDeck, threshold: int = 5) -> bool:
