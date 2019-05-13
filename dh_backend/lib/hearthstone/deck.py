@@ -19,10 +19,12 @@ class HSDeckNoHeroException(Exception):
 class HearthstoneDeck(Deck):
     def __init__(self, deck: Optional[Deck] = None):
         super(HearthstoneDeck, self).__init__()
+        self.deckcode = ""
         if deck:
             self.heroes: List[int] = deck.heroes
             self.cards = deck.cards
             self.format = deck.format
+            self.deckcode = deck.deckcode
 
     @classmethod
     def parse_deck(cls, deckcode: str):
@@ -34,7 +36,9 @@ class HearthstoneDeck(Deck):
         :raises HSDeckParserException: if the deckcode was invalid
         """
         try:
-            return cls.from_deckstring(deckcode)
+            result = cls.from_deckstring(deckcode)
+            result.deckcode = deckcode
+            return result
         except ValueError or binascii.Error:
             raise HSDeckParserException("Error while parsing deckcode")
 
