@@ -58,3 +58,18 @@ def test_user_recent_decks(db_session):
     db_session.commit()
 
     assert user.recent_decks is not None
+
+
+def test_user_generate_api_key(db_session):
+    user = test_user()
+    db_session.add(user)
+    db_session.commit()
+
+    old_key = user.api_key
+    assert len(old_key) > 90
+
+    user.generate_new_api_key()
+    db_session.commit()
+
+    assert len(user.api_key) > 90
+    assert user.api_key != old_key

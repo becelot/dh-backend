@@ -1,6 +1,5 @@
 import re
 
-from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
@@ -42,11 +41,8 @@ class LoginUser(Resource):
             return {"message": "The username or password is not correct.", "status": 422}
 
         # login success, create corresponding tokens for user
-        access_token = create_access_token(identity=username)
-        refresh_token = create_refresh_token(identity=username)
         return {
             'status': 200,
-            'message': 'Logged in as {}'.format(username),
-            'access_token': access_token,
-            'refresh_token': refresh_token
+            'message': f'Logged in as {username}',
+            'api_key': user.api_key
         }

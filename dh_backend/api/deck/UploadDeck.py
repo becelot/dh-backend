@@ -1,9 +1,10 @@
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from typing import List
+
 from flask_restful import Resource
 from flask_restful import reqparse
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
-from dh_backend.models import User, Deck, DeckVersion
+from dh_backend.models import User, Deck, DeckVersion, db
 
 
 class UploadDeck(Resource):
@@ -11,21 +12,21 @@ class UploadDeck(Resource):
 
     parser = reqparse.RequestParser()\
         .add_argument('deckname', type=str, location='json', required=True, help="Deckname is required") \
-        .add_argument('deckstring', type=str, location='json', required=True, help="Deck code is required")
+        .add_argument('deckstring', type=str, location='json', required=True, help="Deck code is required")\
+        .add_argument('user_key', type=str, location='json', required=True, help="The client key identifying the user")
     """
     Expected input format for this resource is:
         - deckname: string -> name of the deck that the user plays
         - deckstring: string -> the hearthstone deck code identifying the deck
+        - user_key: string -> the api key identifying the user
     """
-
-    @jwt_required
     def post(self):
         """Upload a new deck to the tracker"""
         args = UploadDeck.parser.parse_args()
 
         # Get the identity of the uploader
-        username = get_jwt_identity()
-        user: User = User.query.filter_by(user_name=username).first()
+        client_key = args['user_key']
+        user: User = User.query.filter_by(apie_key=client_key).first()
         if user is None:
             return {'status': 401, 'message': 'The username could not be verified'}, 401
 
@@ -36,21 +37,39 @@ class UploadDeck(Resource):
         except HSDeckParserException:
             return {'status': 400, 'message': 'Invalid deck string'}
 
-        # Try to compare to current deck
-        deck: Deck = user.recent_decks.current_deck
-        if deck:
+        # Try to compare to most recent decks
+        decks: List[Deck] = [
+            user.recent_decks.current_deck,
+            user.recent_decks.previous_deck,
+            user.recent_decks.deck_3,
+            user.recent_decks.deck_4,
+            user.recent_decks.deck_5,
+        ]
+        for deck in decks:
 
-            # Get most recent version
-            current_version: DeckVersion = deck.current_version
-            if current_version:
+            # if deck is available
+            if deck:
 
-                # If they are the same, then cancel
-                if current_version.deck_code == deckcode:
-                    return {'status': 422, 'message': 'Deck was already uploaded'}
+                # Get most recent version of the deck
+                current_version: DeckVersion = deck.current_version
+                if current_version:
 
-                # compare the two deck lists
-                current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
-                self.significant_change(new_deck, current_deck)
+                    # If they are the same, then cancel
+                    if current_version.deck_code == deckcode:
+                        return {'status': 422, 'message': 'Deck was already uploaded'}
+
+                    # compare the two deck lists for similarity
+                    current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
+                    if not UploadDeck.significant_change(new_deck, current_deck):
+                        # if the decks are not the same, but similar enough, create a new version for the deck
+                        version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck)
+                        db.session.add(version)
+                        db.session.commit()
+
+                        # and return success message
+                        return {'status': 200, 'message': 'Deck uploaded successfully'}
+
+            # deck was not recently played, so retrieve all other decks that the user has played
 
     @staticmethod
     def significant_change(deck_1: HearthstoneDeck, deck_2: HearthstoneDeck, threshold: int = 5) -> bool:

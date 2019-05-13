@@ -15,6 +15,7 @@ def test_login(db_session, client: FlaskClient):
                            content_type='application/json')
 
     assert response.json['status'] == 200
+    assert response.json['api_key'] == user.api_key
 
 
 def test_username_too_short(client):
