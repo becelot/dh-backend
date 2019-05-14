@@ -80,33 +80,22 @@ class UploadDeck(Resource):
             db.session.commit()
 
             return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
-        elif deck_match == DeckMatch.INEXACT_MATCH:
-            # create a new version for the deck
-            version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck_result)
-            db.session.add(version)
+        elif deck_match == DeckMatch.NO_MATCH:
+            # it is a completely new archetype that the user has not played before, create new deck
+            deck_result = Deck(user=user)
+            db.session.add(deck_result)
             db.session.commit()
 
-            deck_result.current_version = version
-            user.recent_decks.set_recent_deck(deck_result)
-            db.session.commit()
-
-            # and return success message
-            return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
-
-        # it is a completely new archetype that the user has not played before, create new deck
-        deck = Deck(user=user)
-        db.session.add(deck)
-        db.session.commit()
-
-        # including a new version
-        version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck)
+        # create a new version for the deck
+        version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck_result)
         db.session.add(version)
         db.session.commit()
 
-        deck.current_version = version
-        user.recent_decks.set_recent_deck(deck)
+        deck_result.current_version = version
+        user.recent_decks.set_recent_deck(deck_result)
         db.session.commit()
 
+        # and return success message
         return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
 
     @staticmethod
