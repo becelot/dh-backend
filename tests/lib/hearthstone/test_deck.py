@@ -77,3 +77,15 @@ def test_deck_compare_threshold_symmetry():
 
     assert deck1.compare(deck2, 28) == 28
     assert deck2.compare(deck1, 28) == 28
+
+
+def test_copy_constructor():
+    deck1 = HearthstoneDeck.parse_deck("AAEBAc2xAgRxngG/CKLTAg27AqsEtATmBJYF7AXBwQKYxAKP0wL77AKV/wK5/wKjhwMA")
+    deck2 = HearthstoneDeck(deck1)
+
+    assert len(deck1.heroes) == len(deck2.heroes)
+    assert all([h1 == h2 for h1, h2 in zip(deck1.heroes, deck2.heroes)])
+    assert deck1.deckcode == deck2.deckcode
+    assert deck1.format == deck2.format
+    assert len(deck1.cards) == len(deck2.cards)
+    assert all([h1[0] == h2[0] and h1[1] == h2[1] for h1, h2 in zip(deck1.cards, deck2.cards)])

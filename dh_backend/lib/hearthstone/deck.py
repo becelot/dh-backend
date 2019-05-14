@@ -17,12 +17,12 @@ class HSDeckNoHeroException(Exception):
 
 
 class HearthstoneDeck(Deck):
-    def __init__(self, deck: Optional[Deck] = None):
+    def __init__(self, deck: Optional['HearthstoneDeck'] = None):
         super(HearthstoneDeck, self).__init__()
         self.deckcode = ""
         if deck:
-            self.heroes: List[int] = deck.heroes
-            self.cards = deck.cards
+            self.heroes: List[int] = list(deck.heroes)
+            self.cards = list(deck.cards)
             self.format = deck.format
             self.deckcode = deck.deckcode
 
