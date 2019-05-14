@@ -2,11 +2,6 @@ from dh_backend.lib.hearthstone.card import HearthstoneCard
 from dh_backend.lib.hearthstone.database import HearthstoneDatabase
 
 
-class HSInitException(Exception):
-    def __init__(self, *args, **kwargs):
-        super(HSInitException, self).__init__("HearthstoneAPI is not properly initialized", *args, **kwargs)
-
-
 def get_card(card_id: int) -> HearthstoneCard:
     """
     Retrieve a card instance by its ID
