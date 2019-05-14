@@ -1,8 +1,10 @@
 from enum import IntEnum
+from itertools import chain
 from typing import List, Optional, Iterable
 
 from flask_restful import Resource
 from flask_restful import reqparse
+from sqlalchemy import and_
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
 from dh_backend.models import User, Deck, DeckVersion, db
@@ -20,7 +22,8 @@ class UploadDeck(Resource):
     parser = reqparse.RequestParser()\
         .add_argument('deckname', type=str, location='json', required=True, help="Deckname is required") \
         .add_argument('deckstring', type=str, location='json', required=True, help="Deck code is required")\
-        .add_argument('user_key', type=str, location='json', required=True, help="The client key identifying the user")
+        .add_argument('client_key', type=str, location='json', required=True, help="The client key identifying the user"
+                                                                                   "was not provided")
     """
     Expected input format for this resource is:
         - deckname: string -> name of the deck that the user plays
@@ -32,8 +35,8 @@ class UploadDeck(Resource):
         args = UploadDeck.parser.parse_args()
 
         # Get the identity of the uploader
-        client_key = args['user_key']
-        user: User = User.query.filter_by(apie_key=client_key).first()
+        client_key = args['client_key']
+        user: User = User.query.filter_by(api_key=client_key).first()
         if user is None:
             return {'status': 401, 'message': 'The username could not be verified'}, 401
 
@@ -53,19 +56,33 @@ class UploadDeck(Resource):
             user.recent_decks.deck_5,
         ]
 
-        deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, recent_decks)
+        # build a custom iterator that first emits all recent decks, and the the others
+        decks_iterator: Iterable[Deck] = chain(
+            recent_decks,
+            Deck.query.filter(
+                and_(Deck.user == user,
+                     ~Deck.id.in_(filter(lambda x: x is not None,
+                                         map(lambda x: x.id if x is not None else None,
+                                             recent_decks
+                                             )
+                                         )
+                                  )
+                     )
+            ).yield_per(100)
+        )
 
+        # try to find deck in existing ones
+        deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, decks_iterator)
+
+        # an exact match was found
         if deck_match == DeckMatch.EXACT_MATCH:
-            if deck_result == user.recent_decks.current_deck:
-                return {'status': 422, 'message': 'Deck was already uploaded'}
-            else:  # deck matched exact, but is not the currently used deck
-                user.recent_decks.set_recent_deck(deck_result)
-                db.session.commit()
+            user.recent_decks.set_recent_deck(deck_result)
+            db.session.commit()
 
             return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
         elif deck_match == DeckMatch.INEXACT_MATCH:
             # create a new version for the deck
-            version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck_result)
+            version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck_result)
             db.session.add(version)
             db.session.commit()
 
@@ -74,37 +91,19 @@ class UploadDeck(Resource):
             db.session.commit()
 
             # and return success message
-            return {'status': 200, 'message': 'Deck uploaded successfully'}
+            return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
 
-        # deck was not recently played, so retrieve all other decks that the user has played
-        deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, user.decks)
-        if deck_match == DeckMatch.EXACT_MATCH:
-            user.recent_decks.set_recent_deck(deck_result)
-            db.session.commit()
-
-            return {'status': 200, 'message': 'Deck uploaded successfully'}
-        elif deck_match == DeckMatch.INEXACT_MATCH:
-            # create a new version for the deck
-            version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck_result)
-            db.session.add(version)
-            db.session.commit()
-
-            deck_result.current_version = version
-            user.recent_decks.set_recent_deck(deck_result)
-            db.session.commit()
-
-            # and return success message
-            return {'status': 200, 'message': 'Deck uploaded successfully'}
-
-        # it is a completely new archetype that the user has not played before
+        # it is a completely new archetype that the user has not played before, create new deck
         deck = Deck(user=user)
         db.session.add(deck)
         db.session.commit()
 
-        version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck)
+        # including a new version
+        version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck)
         db.session.add(version)
         db.session.commit()
 
+        deck.current_version = version
         user.recent_decks.set_recent_deck(deck)
         db.session.commit()
 
