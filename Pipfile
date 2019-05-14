@@ -10,6 +10,7 @@ pytest-cov = "*"
 pytest-pep8 = "*"
 pytest-html = "*"
 flake8 = "*"
+pytest-ordering = "*"
 
 [packages]
 flask = "*"
