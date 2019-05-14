@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from hearthstone.enums import FormatType
+from hearthstone.enums import FormatType, CardClass
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck
 
@@ -89,3 +89,55 @@ def test_copy_constructor():
     assert deck1.format == deck2.format
     assert len(deck1.cards) == len(deck2.cards)
     assert all([h1[0] == h2[0] and h1[1] == h2[1] for h1, h2 in zip(deck1.cards, deck2.cards)])
+
+
+def test_deck_class():
+    deck = HearthstoneDeck.parse_deck("AAEBAc2xAgRxngG/CKLTAg27AqsEtATmBJYF7AXBwQKYxAKP0wL77AKV/wK5/wKjhwMA")
+
+    assert deck.get_hero_class() == CardClass.MAGE
+
+    deck.heroes = [1686]
+
+    assert deck.get_hero_class() == CardClass.INVALID
+
+
+def test_get_real_cards():
+    deck = HearthstoneDeck.parse_deck("AAECAaIHCLICyAPNA68E1AXlB+f6AtKZAwu0Ae0CywPuBogH3QiGCe/xAtWMA4+XA4mbAwA=")
+    id_list = deck.get_dbf_id_list()
+    real_cards = list(deck.get_real_cards())
+
+    for i in range(len(real_cards)):
+        print(real_cards[i])
+        print(deck.cards[i])
+        assert real_cards[i][0].dbf_id == id_list[i][0]
+        assert real_cards[i][1] == id_list[i][1]
+
+
+def test_get_cards_in_display_order():
+    deck = HearthstoneDeck.parse_deck("AAECAaIHCLICyAPNA68E1AXlB+f6AtKZAwu0Ae0CywPuBogH3QiGCe/xAtWMA4+XA4mbAwA=")
+    deck_list = [
+        ("Backstab", 2),
+        ("Preparation", 2),
+        ("Shadowstep", 2),
+        ("Bloodsail Corsair", 1),
+        ("Deadly Poison", 2),
+        ("Southsea Deckhand", 1),
+        ("Eviscerate", 2),
+        ("Sap", 1),
+        ("Edwin VanCleef", 1),
+        ("EVIL Miscreant", 2),
+        ("Raiding Party", 2),
+        ("SI:7 Agent", 2),
+        ("Dread Corsair", 2),
+        ("Lifedrinker", 2),
+        ("Waggle Pick", 2),
+        ("Captain Greenskin", 1),
+        ("Leeroy Jenkins", 1),
+        ("Myra's Unstable Element", 1),
+        ("Chef Nomi", 1),
+    ]
+    real_cards = list(deck.get_cards_in_deck_order())
+
+    for i in range(len(real_cards)):
+        assert real_cards[i][0].name == deck_list[i][0]
+        assert real_cards[i][1] == deck_list[i][1]
