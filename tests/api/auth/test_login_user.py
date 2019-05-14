@@ -40,3 +40,19 @@ def test_username_invalid(client):
                            content_type='application/json')
 
     assert response.json['status'] == 400
+
+
+def test_user_api_key(client: FlaskClient, db_session):
+    user = User(user_name='TestUser', password='Test', email='NoMAid')
+    db_session.add(user)
+    db_session.commit()
+
+    login = client.post('/api/auth/login',
+                        data=json.dumps({
+                            'username': 'TestUser',
+                            'password': 'Test'
+                        }),
+                        content_type='application/json')
+
+    assert login.status_code == 200
+    assert login.json['api_key'] == user.api_key
