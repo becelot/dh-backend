@@ -56,3 +56,33 @@ def test_user_api_key(client: FlaskClient, db_session):
 
     assert login.status_code == 200
     assert login.json['api_key'] == user.api_key
+
+
+def test_user_not_registered(client: FlaskClient, db_session):
+    user = User(user_name='TestUser', password='Test', email='NoMAid')
+    db_session.add(user)
+    db_session.commit()
+
+    login = client.post('/api/auth/login',
+                        data=json.dumps({
+                            'username': 'TestUser1',
+                            'password': 'Test'
+                        }),
+                        content_type='application/json')
+
+    assert login.status_code == 422
+
+
+def test_user_password_wrong(client: FlaskClient, db_session):
+    user = User(user_name='TestUser', password='Test', email='NoMAid')
+    db_session.add(user)
+    db_session.commit()
+
+    login = client.post('/api/auth/login',
+                        data=json.dumps({
+                            'username': 'TestUser',
+                            'password': 'Test2'
+                        }),
+                        content_type='application/json')
+
+    assert login.status_code == 422
