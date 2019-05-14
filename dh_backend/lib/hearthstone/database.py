@@ -12,7 +12,8 @@ class HSNoSuchCardException(Exception):
 
 
 class HearthstoneDatabaseMeta(type):
-    __database__: Dict[int, HearthstoneCard]
+    __database__: Dict[int, HearthstoneCard] = None
+    initialized: bool = False
     app: Optional[Flask] = None
 
     def __getitem__(cls, val):
@@ -46,6 +47,9 @@ class HearthstoneDatabaseMeta(type):
         if cls.app is not None:
             cls.app.logger.info("HearthstoneDatabase: Loading database...")
 
+        if cls.initialized:
+            return
+
         from hearthstone_data import get_carddefs_path
         path = get_carddefs_path()
 
@@ -58,6 +62,8 @@ class HearthstoneDatabaseMeta(type):
                 card = HearthstoneCard.from_xml(carddata)
                 card.locale = locale
                 cls.__database__[getattr(card, 'dbf_id')] = card
+
+        cls.initialized = True
 
 
 class HearthstoneDatabase(object, metaclass=HearthstoneDatabaseMeta):
