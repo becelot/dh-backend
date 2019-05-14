@@ -42,7 +42,7 @@ class UploadDeck(Resource):
         try:
             new_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(deckcode)
         except HSDeckParserException:
-            return {'status': 400, 'message': 'Invalid deck string'}
+            return {'status': 400, 'message': 'Invalid deck string'}, 400
 
         # Try to compare to most recent decks
         recent_decks: List[Deck] = [
@@ -62,7 +62,7 @@ class UploadDeck(Resource):
                 user.recent_decks.set_recent_deck(deck_result)
                 db.session.commit()
 
-                return {'status': 200, 'message': 'Deck uploaded successfully'}
+            return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
         elif deck_match == DeckMatch.INEXACT_MATCH:
             # create a new version for the deck
             version = DeckVersion(deck_name=args['deckname'], deckcode=deckcode, deck=deck_result)
@@ -108,11 +108,7 @@ class UploadDeck(Resource):
         user.recent_decks.set_recent_deck(deck)
         db.session.commit()
 
-        return {'status': 200, 'message': 'Deck uploaded successfully'}
-
-    @staticmethod
-    def update_with_deck_info(deck: HearthstoneDeck, resource: Deck):
-        pass
+        return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
 
     @staticmethod
     def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
@@ -129,7 +125,7 @@ class UploadDeck(Resource):
 
                     # compare the two deck lists for similarity
                     current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
-                    if not UploadDeck.significant_change(deck, current_deck):
+                    if not UploadDeck.significant_change(new_deck, current_deck):
                         # if the decks are not the same, but similar enough, create a new version for the deck
                         return DeckMatch.INEXACT_MATCH, deck
 
@@ -147,7 +143,7 @@ class UploadDeck(Resource):
 
         # First, check if the classes match
         if deck_1.get_hero_class() != deck_2.get_hero_class():
-            return False
+            return True
 
         # if the decks differ in at most threshold cards
         return deck_1.compare(deck_2, threshold+1) > threshold
