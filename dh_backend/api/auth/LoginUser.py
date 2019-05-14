@@ -28,21 +28,21 @@ class LoginUser(Resource):
 
         pattern = re.compile("^[a-zA-Z0-9]{4,24}$")
         if not pattern.match(username):
-            return {"status": 400, "message": "The username has an invalid format."}
+            return {"status": 400, "message": "The username has an invalid format."}, 400
 
         # check if user is registered
         user = User.query.filter_by(user_name=username).first()
         if not user:
-            return {"message": "The username or password is not correct.", "status": 422}
+            return {"message": "The username or password is not correct.", "status": 422}, 422
 
         # check password of user
         password: str = args['password']
         if user.password != password:
-            return {"message": "The username or password is not correct.", "status": 422}
+            return {"message": "The username or password is not correct.", "status": 422}, 422
 
         # login success, create corresponding tokens for user
         return {
             'status': 200,
             'message': f'Logged in as {username}',
             'api_key': user.api_key
-        }
+        }, 200
