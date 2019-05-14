@@ -4,7 +4,7 @@ from dh_backend.models import User
 
 
 def test_user():
-    user = User(user_name="Test", password="Test", email="test@nomail.de")
+    user = User(user_name="TestUser", password="Test", email="test@nomail.de")
     return user
 
 
