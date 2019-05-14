@@ -65,7 +65,7 @@ class HearthstoneDeck(Deck):
         :return: A deck in display deck order
         """
         return sorted(
-            sorted(self.get_real_cards(), key=lambda x: x[0].name),
+            sorted(self.get_real_cards(), key=lambda x: x[0].name.lower()),
             key=lambda x: x[0].cost
         )
 
