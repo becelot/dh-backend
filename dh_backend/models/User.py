@@ -21,7 +21,7 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     recent_decks: RecentDeck = db.relationship("RecentDeck", uselist=False, back_populates="user", cascade="all,delete")
-    decks = db.relationship("Deck", back_populates="user")
+    decks = db.relationship("Deck", back_populates="user", lazy="dynamic")
     api_key: str = db.Column(db.String, nullable=False, default=generate_new_key)
 
     def generate_new_api_key(self):
