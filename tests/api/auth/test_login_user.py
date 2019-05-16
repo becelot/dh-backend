@@ -70,7 +70,7 @@ def test_user_not_registered(client: FlaskClient, db_session):
                         }),
                         content_type='application/json')
 
-    assert login.status_code == 422
+    assert login.json['status'] == 422
 
 
 def test_user_password_wrong(client: FlaskClient, db_session):
@@ -85,4 +85,4 @@ def test_user_password_wrong(client: FlaskClient, db_session):
                         }),
                         content_type='application/json')
 
-    assert login.status_code == 422
+    assert login.json['status'] == 422
