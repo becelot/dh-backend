@@ -28,6 +28,7 @@ class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL')
     SECRET_KEY: str = os.environ.get('SECRET_KEY')
+    JWT_SECRET_KEY: str = os.environ.get('JWT_SECRET_KEY')
 
 
 config: Dict[str, Type[Config]] = {"dev": DevelopmentConfig, "prod": ProductionConfig, "test": TestConfig}
