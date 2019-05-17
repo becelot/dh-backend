@@ -43,7 +43,7 @@ class TwitchSession(Resource):
 
         # return error if not successfully authenticated
         if not authenticated:
-            return {'status': 422, 'message': 'Authentication failure'}
+            return {'status': 422, 'message': 'Authentication failed.'}
 
         # create a temporary session token and
         session_token = create_access_token(username, user_claims={'twitch_link': True})
@@ -53,5 +53,12 @@ class TwitchSession(Resource):
 
         return {
             'status': 200,
-            'session_token': session_token
+            'message': 'Authentication session created',
+            'auth_url': "https://id.twitch.tv/oauth2/authorize"
+                        "?client_id=3jqh17gag0ubkiz9h24z7gp5x3fd8e"
+                        "&redirect_uri=http://localhost:5000/api/auth/twitch_redirect"
+                        "&response_type=code"
+                        "&scope=user:read:email"
+                        "&force_verify=true"
+                        f"&state={session_token}"
         }
