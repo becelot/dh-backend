@@ -30,7 +30,7 @@ def test_client_key_invalid(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert response.status_code == 401
+    assert response.json['status'] == 401
 
 
 def test_deck_code_invalid(client: FlaskClient, db_session):
@@ -46,7 +46,7 @@ def test_deck_code_invalid(client: FlaskClient, db_session):
                            }),
                            content_type='application/json')
 
-    assert response.status_code == 400
+    assert response.json['status'] == 400
 
 
 def setup_user(db_session):
