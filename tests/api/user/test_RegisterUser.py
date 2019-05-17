@@ -2,8 +2,10 @@ import json
 
 from flask.testing import FlaskClient
 
+from dh_backend.models import RecentDeck
 
-def test_register_user(client: FlaskClient):
+
+def test_register_user(client: FlaskClient, db_session):
     register = client.post('/api/user/register',
                            data=json.dumps({
                                'username': 'test',
@@ -13,6 +15,8 @@ def test_register_user(client: FlaskClient):
                            content_type='application/json')
 
     assert register.json["status"] == 201
+
+    assert len(db_session.query(RecentDeck).all()) == 1
 
 
 def test_register_already_registered(client: FlaskClient):
