@@ -3,7 +3,7 @@ import re
 from flask import request
 from flask_restful import Resource
 
-from dh_backend.models import db, User
+from dh_backend.models import db, User, RecentDeck
 
 
 class RegisterUser(Resource):
@@ -26,6 +26,10 @@ class RegisterUser(Resource):
 
         new_user = User(user_name=username, password=data["password"], email=data["email"])
         db.session.add(new_user)
+        db.session.commit()
+
+        recent_decks = RecentDeck(user=new_user)
+        db.session.add(recent_decks)
         db.session.commit()
 
         return {"message": "User was successfully registered", "status": 201}
