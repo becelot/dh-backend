@@ -38,14 +38,14 @@ class UploadDeck(Resource):
         client_key = args['client_key']
         user: User = User.query.filter_by(api_key=client_key).first()
         if user is None:
-            return {'status': 401, 'message': 'The username could not be verified'}, 401
+            return {'status': 401, 'message': 'The username could not be verified'}
 
         # Validate new deckcode
         deckcode: str = args.get("deckstring")
         try:
             new_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(deckcode)
         except HSDeckParserException:
-            return {'status': 400, 'message': 'Invalid deck string'}, 400
+            return {'status': 400, 'message': 'Invalid deck string'}
 
         # Try to compare to most recent decks
         recent_decks: List[Deck] = [
@@ -79,7 +79,7 @@ class UploadDeck(Resource):
             user.recent_decks.set_recent_deck(deck_result)
             db.session.commit()
 
-            return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
+            return {'status': 200, 'message': 'Deck uploaded successfully'}
         elif deck_match == DeckMatch.NO_MATCH:
             # it is a completely new archetype that the user has not played before, create new deck
             deck_result = Deck(user=user)
@@ -96,7 +96,7 @@ class UploadDeck(Resource):
         db.session.commit()
 
         # and return success message
-        return {'status': 200, 'message': 'Deck uploaded successfully'}, 200
+        return {'status': 200, 'message': 'Deck uploaded successfully'}
 
     @staticmethod
     def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
