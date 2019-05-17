@@ -1,6 +1,6 @@
 from flask_restful import Api
 
-from dh_backend.api.auth import TwitchSession
+from dh_backend.api.auth.TwitchSession import TwitchSession
 from dh_backend.api.auth.LoginUser import LoginUser
 
 

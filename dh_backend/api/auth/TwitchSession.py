@@ -23,7 +23,7 @@ class TwitchSession(Resource):
     """
 
     def post(self):
-        args = self.parser.parse_args()
+        args = TwitchSession.parser.parse_args()
 
         # username sanity checks
         username: str = args['username']
