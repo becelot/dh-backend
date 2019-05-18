@@ -41,6 +41,12 @@ class DhBackend(Flask):
 
         JWTManager(self)
 
+    def add_twitch(self):
+        """Add Twitch client to application"""
+        from dh_backend.lib.twitch import twitch
+
+        twitch.init_app(self)
+
 
 def create_app(*args, **kw):
     backend = DhBackend(*args, **kw)
@@ -49,6 +55,7 @@ def create_app(*args, **kw):
     backend.add_restul_api()
     backend.load_resources()
     backend.add_auth()
+    backend.add_twitch()
     return backend
 
 
