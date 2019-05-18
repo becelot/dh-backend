@@ -59,5 +59,12 @@ def create_app(*args, **kw):
     return backend
 
 
+def create_migration_app(*args, **kw):
+    backend = DhBackend(*args, **kw)
+    backend.add_sqlalchemy()
+    backend.add_logger()
+    return backend
+
+
 def create_test_app():
     return create_app(config=TestConfig)
