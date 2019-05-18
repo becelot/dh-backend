@@ -1,6 +1,6 @@
 import secrets
 
-from dh_backend.models import db, RecentDeck
+from dh_backend.models import db, RecentDeck, TwitchSession
 
 
 def generate_new_key():
@@ -24,7 +24,7 @@ class User(db.Model):
     decks = db.relationship("Deck", back_populates="user", lazy="dynamic")
     api_key: str = db.Column(db.String, nullable=False, default=generate_new_key)
     twitch_auth_session: str = db.Column(db.String, nullable=True, default=None)
-    twitch_session = db.relationship("TwitchSession", back_populates="user", uselist=False, cascade="all,delete")
+    twitch_session: TwitchSession = db.relationship("TwitchSession", back_populates="user", uselist=False, cascade="all,delete")
 
     def generate_new_api_key(self):
         self.api_key = generate_new_key()
