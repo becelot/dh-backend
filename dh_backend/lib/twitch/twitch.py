@@ -1,5 +1,3 @@
-from typing import Optional
-
 from flask import Flask
 
 from dh_backend.lib.twitch.api import TwitchAPI
