@@ -1,6 +1,9 @@
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
+from requests import Request, Response, Session, PreparedRequest
 
+from dh_backend.lib.twitch import twitch
+from dh_backend.lib.twitch.models.user import TwitchUser
 from dh_backend.models import User
 
 
@@ -25,4 +28,9 @@ class TwitchRedirect(Resource):
         if not user:
             return "Authorization failed. Invalid session."
 
-        return f"{args['code']} + {args['state']} + {args['scope']}"
+        if not twitch.auth_flow().validate_redirect_authorization():
+            return "Authorization failed. Invalid session."
+
+        twitch_user: TwitchUser = twitch.user(user)
+
+        return twitch_user.login
