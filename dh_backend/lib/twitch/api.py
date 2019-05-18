@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 
+import requests
 from flask import Flask
 
 
@@ -10,6 +11,16 @@ class TwitchAPI(object):
         self.client_secret: Optional[str] = None
         self.requires_auth: bool = requires_auth
         self.redirect_url: Optional[str] = None
+        self.base_url: str = 'https://api.twitch.tv/helix/'
+
+    def _headers(self, custom: Dict[str, str] = None) -> Dict[str, str]:
+        default: Dict[str, str] = {
+            'Client-ID': self.client_id
+        }
+        return {**default, **custom} if custom else default.copy()
+
+    def _url(self, path: str = '') -> str:
+        return self.base_url.rstrip('/') + '/' + path.lstrip('/')
 
     def init_app(self, app: Flask):
 
@@ -31,3 +42,17 @@ class TwitchAPI(object):
         # if authentication requirements is fulfilled, implicitly set the parameter
         if self.client_secret and self.redirect_url:
             self.requires_auth = True
+
+    def request(self, method, path: str = '', **kwargs) -> dict:
+        url: str = self._url(path=path)
+        request = requests.Request(method, url, **kwargs).prepare()
+
+        response: requests.Response = requests.Session().send(request)
+
+        # Raise exception if status code is not 200
+        response.raise_for_status()
+
+        return response.json()
+
+    def get(self, path: str, params: Dict[str, Any] = None, headers: Dict[str, Any] = None, **kwargs) -> dict:
+        return self.request('GET', path, params=params, headers=self._headers(headers), **kwargs)
