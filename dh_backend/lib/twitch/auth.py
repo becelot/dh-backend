@@ -1,9 +1,11 @@
 import secrets
+from datetime import datetime, timedelta
 
+import requests
 from flask import request
 
 from dh_backend.lib.twitch.api import TwitchAPI
-from dh_backend.models import User, db
+from dh_backend.models import User, db, TwitchSession
 
 
 class TwitchOAuth(object):
@@ -56,4 +58,28 @@ class TwitchOAuth(object):
         if not code:
             return False, f"Authorization failed. Please try again later."
 
-        return False
+        req: requests.PreparedRequest = \
+            requests.Request('POST',
+                             "https://id.twitch.tv/oauth2/token"
+                             f"?client_id={self.api.client_id}"
+                             f"&client_secret={self.api.client_secret}"
+                             f"&code={code}"
+                             "&grant_type=authorization_code"
+                             f"&redirect_uri={self.api.redirect_url}")\
+            .prepare()
+
+        response: requests.Response = requests.Session().send(req)
+
+        twitch_session: TwitchSession = TwitchSession(
+            code=code,
+            user=user,
+            access_token=response.json()['access_token'],
+            refresh_token=response.json()['refresh_token'],
+            expires_at=datetime.now() + timedelta(seconds=response.json()['expires_in']),
+            scope=" ".join(response.json()['scope']),
+            token_type=response.json()['token_type']
+        )
+        db.session.add(twitch_session)
+        db.session.commit()
+
+        return True, "Authorization validated"
