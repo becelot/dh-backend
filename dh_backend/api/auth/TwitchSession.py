@@ -1,7 +1,6 @@
 import re
 import secrets
 
-from flask_jwt_extended import create_access_token
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
@@ -46,8 +45,7 @@ class TwitchSession(Resource):
             return {'status': 422, 'message': 'Authentication failed.'}
 
         # create a temporary session token and
-        session_token = create_access_token(username, user_claims={'twitch_link': True})
-
+        session_token: str = secrets.token_urlsafe(30)
         user.twitch_auth_session = session_token
         db.session.commit()
 
