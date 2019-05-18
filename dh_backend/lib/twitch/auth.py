@@ -30,3 +30,30 @@ class TwitchOAuth(object):
                "&scope=user:read:email" \
                "&force_verify=true" \
                f"&state={session_token}"
+
+    def validate_redirect_authorization(self) -> (bool, str):
+        """
+        Validates the authorization redirection
+        :return: True iff the authorization succeeded
+        """
+        # first, check the state
+        session = request.args.get('state')
+        if not session:
+            return False, "Authorization failed. CSRF token was not provided."
+
+        user: User = User.query.filter_by(twitch_auth_session=session).first()
+        if not user:
+            return False, "Authorization failed. Invalid session."
+
+        # check if the error flag is set
+        error = request.args.get('error')
+        if error:
+            message = request.args.get('error_description') if request.args.get('error_description')\
+                else 'Unspecified error.'
+            return False, f"Access Denied: {message}"
+
+        code = request.args.get('code')
+        if not code:
+            return False, f"Authorization failed. Please try again later."
+
+        return False
