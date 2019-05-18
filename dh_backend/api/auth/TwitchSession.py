@@ -4,6 +4,7 @@ import secrets
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
+from dh_backend.lib.twitch import twitch
 from dh_backend.models import User, db
 
 
@@ -44,19 +45,8 @@ class TwitchSession(Resource):
         if not authenticated:
             return {'status': 422, 'message': 'Authentication failed.'}
 
-        # create a temporary session token and
-        session_token: str = secrets.token_urlsafe(30)
-        user.twitch_auth_session = session_token
-        db.session.commit()
-
         return {
             'status': 200,
             'message': 'Authentication session created',
-            'auth_url': "https://id.twitch.tv/oauth2/authorize"
-                        "?client_id=3jqh17gag0ubkiz9h24z7gp5x3fd8e"
-                        "&redirect_uri=http://localhost:5000/api/auth/twitch_redirect"
-                        "&response_type=code"
-                        "&scope=user:read:email"
-                        "&force_verify=true"
-                        f"&state={session_token}"
+            'auth_url': twitch.auth_flow().create_oauth_session(user)
         }
