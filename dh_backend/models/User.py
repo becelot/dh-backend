@@ -23,7 +23,6 @@ class User(db.Model):
     recent_decks: RecentDeck = db.relationship("RecentDeck", uselist=False, back_populates="user", cascade="all,delete")
     decks = db.relationship("Deck", back_populates="user", lazy="dynamic")
     api_key: str = db.Column(db.String, nullable=False, default=generate_new_key)
-    twitch_auth_session: str = db.Column(db.String, nullable=True, default=None)
     twitch_session: TwitchSession = db.relationship("TwitchSession",
                                                     back_populates="user",
                                                     uselist=False,

@@ -3,7 +3,7 @@ from flask_restful.reqparse import RequestParser
 
 from dh_backend.lib.twitch import twitch
 from dh_backend.lib.twitch.models.user import TwitchUser
-from dh_backend.models import User, TwitchAccount, db
+from dh_backend.models import User, TwitchAccount, db, TwitchSession
 
 
 class TwitchRedirect(Resource):
@@ -23,14 +23,14 @@ class TwitchRedirect(Resource):
         if not session:
             return "Authorization failed. Please try again later."
 
-        user: User = User.query.filter_by(twitch_auth_session=session).first()
-        if not user:
+        twitch_session: TwitchSession = TwitchSession.query.filter_by(twitch_session_token=session).first()
+        if not twitch_session:
             return "Authorization failed. Invalid session."
 
         if not twitch.auth_flow().validate_redirect_authorization():
             return "Authorization failed. Invalid session."
 
-        account: TwitchAccount = TwitchAccount.from_user(user)
+        account: TwitchAccount = TwitchAccount.from_user(twitch_session.user)
         db.session.add(account)
         db.session.commit()
 

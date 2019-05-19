@@ -20,9 +20,11 @@ class TwitchOAuth(object):
         """
         # create new session token
         session_token: str = secrets.token_urlsafe(30)
-        while User.query.filter_by(twitch_auth_session=session_token).first() is not None:
+        while TwitchSession.query.filter_by(twitch_session_token=session_token).first() is not None:
             session_token = secrets.token_urlsafe(30)  # pragma: no cover
-        user.twitch_auth_session = session_token
+
+        twitch_session: TwitchSession = TwitchSession(user=user, twitch_session_token=session_token)
+        db.session.add(twitch_session)
         db.session.commit()
 
         return "https://id.twitch.tv/oauth2/authorize" \
@@ -43,8 +45,8 @@ class TwitchOAuth(object):
         if not session:
             return False, "Authorization failed. CSRF token was not provided."
 
-        user: User = User.query.filter_by(twitch_auth_session=session).first()
-        if not user:
+        twitch_session: TwitchSession = TwitchSession.query.filter_by(twitch_session_token=session).first()
+        if not twitch_session:
             return False, "Authorization failed. Invalid session."
 
         # check if the error flag is set
@@ -58,6 +60,7 @@ class TwitchOAuth(object):
         if not code:
             return False, f"Authorization failed. Please try again later."
 
+        # Get access token using the OAuth code retrieved
         req: requests.PreparedRequest = \
             requests.Request('POST',
                              "https://id.twitch.tv/oauth2/token"
@@ -70,16 +73,15 @@ class TwitchOAuth(object):
 
         response: requests.Response = requests.Session().send(req)
 
-        twitch_session: TwitchSession = TwitchSession(
-            code=code,
-            user=user,
-            access_token=response.json()['access_token'],
-            refresh_token=response.json()['refresh_token'],
-            expires_at=datetime.now() + timedelta(seconds=response.json()['expires_in']),
-            scope=" ".join(response.json()['scope']),
-            token_type=response.json()['token_type']
-        )
-        db.session.add(twitch_session)
+        if response.status_code != 200:
+            return False, "Could not acquire access token from Twitch"
+
+        # update the twitch session with the retrieved data
+        twitch_session.access_token = response.json()['access_token']
+        twitch_session.refresh_token = response.json()['refresh_token']
+        twitch_session.expires_at = datetime.now() + timedelta(seconds=response.json()['expires_in'])
+        twitch_session.scope = " ".join(response.json()['scope'])
+        twitch_session.token_type = response.json()['token_type']
         db.session.commit()
 
         return True, "Authorization validated"
