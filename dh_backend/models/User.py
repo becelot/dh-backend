@@ -28,6 +28,10 @@ class User(db.Model):
                                                     back_populates="user",
                                                     uselist=False,
                                                     cascade="all,delete")
+    twitch_account = db.relationship("TwitchAccount",
+                                     back_populates="user",
+                                     uselist=False,
+                                     cascade="all,delete")
 
     def generate_new_api_key(self):
         self.api_key = generate_new_key()
