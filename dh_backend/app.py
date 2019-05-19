@@ -1,6 +1,7 @@
 from typing import Type
 
 from flask import Flask
+from flask_restful import Api
 
 from dh_backend.config import Config, DevelopmentConfig, TestConfig
 
@@ -17,11 +18,11 @@ class DhBackend(Flask):
 
         db.init_app(self)
 
-    def add_restul_api(self):
+    def add_restul_api(self) -> Api:
         """Registers the URL endpoints of the RESTful API"""
         from dh_backend.api import load_api
 
-        load_api(self)
+        return load_api(self)
 
     def add_logger(self):
         """Add a logger to the application"""
@@ -66,5 +67,15 @@ def create_migration_app(*args, **kw):
     return backend
 
 
-def create_test_app():
-    return create_app(config=TestConfig)
+def create_test_app(*args, **kw):
+    from tests.mock_endpoints import load_mock_endpoints
+
+    backend = DhBackend(*args, config=TestConfig, **kw)
+    backend.add_sqlalchemy()
+    backend.add_logger()
+    api: Api = backend.add_restul_api()
+    load_mock_endpoints(api)
+    backend.load_resources()
+    backend.add_auth()
+    backend.add_twitch()
+    return backend
