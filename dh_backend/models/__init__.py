@@ -5,5 +5,14 @@ from .Deck import Deck
 from .DeckVersion import DeckVersion
 from .RecentDeck import RecentDeck
 from .TwitchSession import TwitchSession
+from .TwitchAccount import TwitchAccount
 
-__all__ = ["db", "User", "Deck", "DeckVersion", "RecentDeck", "TwitchSession"]
+__all__ = [
+    "db",
+    "User",
+    "Deck",
+    "DeckVersion",
+    "RecentDeck",
+    "TwitchSession",
+    "TwitchAccount"
+]
