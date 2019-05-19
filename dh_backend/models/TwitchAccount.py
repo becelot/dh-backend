@@ -17,7 +17,7 @@ class TwitchAccount(db.Model):
     broadcaster_type = db.Column(db.String)
     description = db.Column(db.String)
     view_count = db.Column(db.Integer)
-    email = db.Column(db.Integer)
+    email = db.Column(db.String)
 
     @staticmethod
     def from_user(user: User) -> 'TwitchAccount':
