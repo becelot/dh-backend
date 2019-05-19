@@ -29,6 +29,10 @@ class TwitchAPI(object):
         if not self.client_id:
             self.client_id = app.config.get('TWITCH_CLIENT_ID')
 
+        # reconfigure the Helix endpoint URL
+        if app.config.get('TWITCH_HELIX_ENDPOINT'):
+            self.base_url = app.config.get('TWITCH_HELIX_ENDPOINT')
+
         # get client_secret and redirection URL
         self.client_secret = app.config.get('TWITCH_CLIENT_SECRET')
         self.redirect_url = app.config.get('TWITCH_REDIRECT_URL')
