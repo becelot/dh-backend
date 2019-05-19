@@ -27,7 +27,7 @@ class TwitchOAuth(object):
         db.session.add(twitch_session)
         db.session.commit()
 
-        return "https://id.twitch.tv/oauth2/authorize" \
+        return f"{self.api.twitch_authorization_endpoint}authorize" \
                f"?client_id={self.api.client_id}" \
                f"&redirect_uri={self.api.redirect_url}" \
                "&response_type=code" \
@@ -63,7 +63,7 @@ class TwitchOAuth(object):
         # Get access token using the OAuth code retrieved
         req: requests.PreparedRequest = \
             requests.Request('POST',
-                             "https://id.twitch.tv/oauth2/token"
+                             f"{self.api.twitch_authorization_endpoint}token"
                              f"?client_id={self.api.client_id}"
                              f"&client_secret={self.api.client_secret}"
                              f"&code={code}"

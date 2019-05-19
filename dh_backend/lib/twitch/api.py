@@ -12,6 +12,7 @@ class TwitchAPI(object):
         self.requires_auth: bool = requires_auth
         self.redirect_url: Optional[str] = None
         self.base_url: str = 'https://api.twitch.tv/helix/'
+        self.twitch_authorization_endpoint = 'https://id.twitch.tv/oauth2/'
 
     def _headers(self, custom: Dict[str, str] = None) -> Dict[str, str]:
         default: Dict[str, str] = {
@@ -31,6 +32,10 @@ class TwitchAPI(object):
         # get client_secret and redirection URL
         self.client_secret = app.config.get('TWITCH_CLIENT_SECRET')
         self.redirect_url = app.config.get('TWITCH_REDIRECT_URL')
+
+        # if the authorization configuration option is set, use it instead
+        if app.config.get('TWITCH_AUTHORIZATION_ENDPOINT'):
+            self.twitch_authorization_endpoint = app.config.get('TWITCH_AUTHORIZATION_ENDPOINT')
 
         # if client secret was not provided, but the application requires authorization, fail
         if not self.client_secret and self.requires_auth:
