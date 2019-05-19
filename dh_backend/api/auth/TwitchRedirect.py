@@ -2,8 +2,7 @@ from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
 from dh_backend.lib.twitch import twitch
-from dh_backend.lib.twitch.models.user import TwitchUser
-from dh_backend.models import User, TwitchAccount, db, TwitchSession
+from dh_backend.models import TwitchAccount, db, TwitchSession
 
 
 class TwitchRedirect(Resource):
