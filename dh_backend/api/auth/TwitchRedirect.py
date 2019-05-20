@@ -1,3 +1,4 @@
+from flask import render_template_string, Response
 from flask_restful import Resource
 from flask_restful.reqparse import RequestParser
 
@@ -20,20 +21,21 @@ class TwitchRedirect(Resource):
     def get(self):
         args = TwitchRedirect.parser.parse_args()
 
-        authorized, _ = twitch.auth_flow().validate_redirect_authorization()
+        authorized, message = twitch.auth_flow().validate_redirect_authorization()
         if not authorized:
-            return "Authorization failed. Invalid session."
+            return Response(render_template_string('Authroization failed. Reason: {{ reason }}', reason=message),
+                            mimetype='text/html')
 
         session = args['state']
-        if not session:
-            return "Authorization failed. Please try again later."
-
         twitch_session: TwitchSession = TwitchSession.query.filter_by(twitch_session_token=session).first()
-        if not twitch_session:
-            return "Authorization failed. Invalid session."
 
         account: TwitchAccount = TwitchAccount.from_user(twitch_session.user)
         db.session.add(account)
         db.session.commit()
 
-        return account.login
+        return Response(render_template_string(
+                'Authroization success. Linked account to {{ username }}',
+                username=account.display_name
+            ),
+            mimetype='text/html'
+        )
