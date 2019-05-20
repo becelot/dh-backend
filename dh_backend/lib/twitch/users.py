@@ -1,4 +1,4 @@
-from typing import List, Generator
+from typing import List
 
 from dh_backend.lib.twitch.api import TwitchAPI
 from dh_backend.lib.twitch.models.user import TwitchUser

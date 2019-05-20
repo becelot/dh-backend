@@ -22,7 +22,8 @@ def mock_twitch_oauth_token(responses, twitch_db):
         if not pending_session:
             return 200, {'Content-Type': 'application/json'}, json.dumps({'error': 'No session'})
 
-        if client_id != pending_session['expected_client_id'] or client_secret != pending_session['expected_client_secret']:
+        if client_id != pending_session['expected_client_id'] or \
+                client_secret != pending_session['expected_client_secret']:
             return 200, {'Content-Type': 'application/json'}, json.dumps({'error': 'Invalid client credentials'})
 
         if grant_type != pending_session['grant_type']:

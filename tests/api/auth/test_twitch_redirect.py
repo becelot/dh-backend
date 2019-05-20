@@ -1,10 +1,8 @@
-import json
 import secrets
 
 import pytest
 from flask import Response
 from flask.testing import FlaskClient
-from requests import Request
 
 from dh_backend.lib.twitch import twitch
 from dh_backend.lib.twitch.models import TwitchUser
