@@ -5,7 +5,7 @@ from flask.testing import FlaskClient
 
 from dh_backend.models import RecentDeck, User
 from tests.data.decks import TokenDruid, SilencePriest, MurlocShaman, EvenWarlock, SummonMage, SecretPaladin, \
-    PirateRogue, TokenDruid2, SummonMage2, SecretMage
+    PirateRogue, TokenDruid2, SummonMage2, SecretMage, TokenDruidMalfurion
 from tests.data.users import test_user
 
 
@@ -77,7 +77,7 @@ def run_cases(client: FlaskClient, user: User, decks: List[str], tests: TestSpec
                                    'client_key': user.api_key
                                }),
                                content_type='application/json')
-
+        print(test)
         assert response.status_code == 200
         assert (None if test[1][0] is None else user.recent_decks.current_deck.current_version.deck_code) == \
                (None if test[1][0] is None else decks[test[1][0]])
@@ -178,6 +178,44 @@ def test_upload_deck_inexact_match(client: FlaskClient, db_session):
         (9, (9, 3, 6, 5, 2)),
         (8, (8, 9, 3, 6, 5)),
         (7, (7, 8, 9, 3, 6))
+    ]
+
+    run_cases(client, user, decks, tests)
+    assert len(user.decks.all()) == 8
+
+
+def test_upload_deck_exact_match_hero_diff(client: FlaskClient, db_session):
+    user = setup_user(db_session)
+
+    decks = [
+        TokenDruid,
+        SilencePriest,
+        MurlocShaman,
+        EvenWarlock,
+        SummonMage,
+        SecretPaladin,
+        PirateRogue,
+        SecretMage,
+        TokenDruid2,
+        SummonMage2,
+        TokenDruidMalfurion
+    ]
+
+    tests = [
+        (0, (0, None, None, None, None)),
+        (10, (0, None, None, None, None)),
+        (1, (1, 0, None, None, None)),
+        (2, (2, 1, 0, None, None)),
+        (3, (3, 2, 1, 0, None)),
+        (10, (0, 3, 2, 1, None)),
+        (4, (4, 0, 3, 2, 1)),
+        (5, (5, 4, 0, 3, 2)),
+        (6, (6, 5, 4, 0, 3)),
+        (3, (3, 6, 5, 4, 0)),
+        (9, (9, 3, 6, 5, 0)),
+        (8, (8, 9, 3, 6, 5)),
+        (7, (7, 8, 9, 3, 6)),
+        (10, (10, 7, 9, 3, 6))
     ]
 
     run_cases(client, user, decks, tests)

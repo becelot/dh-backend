@@ -1,6 +1,7 @@
 from dh_backend.models import DeckVersion, Deck
 
 TokenDruid = "AAECAZICAtfvAtaZAw5A/QL3A+YFxAaY+wLf+wL2/QKJgAOMgAO0kQPDlAPOlAPKnAMA"
+TokenDruidMalfurion = "AAECAbSKAwLX7wLWmQMOQP0C9wPmBcQGmPsC3/sC9v0CiYADjIADtJEDw5QDzpQDypwDAA=="
 TokenDruid2 = "AAECAZICAtfvAtaZAw5A/QL3A+YFxAaY+wLf+wKJgAOMgAO0kQPDlAPOlAPKnAPTnAMA"
 SilencePriest = "AAECAa0GBPIF64gDgpQDyJ0DDe0B+ALdBOUEpQnRCtIK8gzy8QKDlAOHlQOumwOCnQMA"
 MurlocShaman = "AAECAaoIArWYA5ybAw6/AcUD2wP+A+MF0AenCJMJ8PMC3oID4okDjJQDxpkD9JkDAA=="
