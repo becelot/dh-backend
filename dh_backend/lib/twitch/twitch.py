@@ -15,7 +15,7 @@ class Twitch(object):
         self.api.init_app(app)
 
     def auth_flow(self) -> TwitchOAuth:
-        if not self.api.requires_auth:
+        if not self.api.requires_auth:  # pragma: no cover
             raise Exception("Application is not configured for authentication")
 
         return TwitchOAuth(self.api)
