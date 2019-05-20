@@ -113,14 +113,19 @@ class UploadDeck(Resource):
 
                     # compare the two deck lists for similarity
                     current_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(current_version.deck_code)
-                    if not UploadDeck.significant_change(new_deck, current_deck):
+                    significant, diff = UploadDeck.significant_change(new_deck, current_deck)
+                    if not significant:
+                        # decks are not the same, but list of cards is identical, only differs in selected hero portrait
+                        if diff == 0:
+                            return DeckMatch.EXACT_MATCH, deck
+
                         # if the decks are not the same, but similar enough, create a new version for the deck
                         return DeckMatch.INEXACT_MATCH, deck
 
         return DeckMatch.NO_MATCH, None
 
     @staticmethod
-    def significant_change(deck_1: HearthstoneDeck, deck_2: HearthstoneDeck, threshold: int = 5) -> bool:
+    def significant_change(deck_1: HearthstoneDeck, deck_2: HearthstoneDeck, threshold: int = 5) -> (bool, int):
         """
         Detect if the two provided decks differ by a significant amount
         :param deck_1: The first deck to compare
@@ -134,4 +139,5 @@ class UploadDeck(Resource):
             return True
 
         # if the decks differ in at most threshold cards
-        return deck_1.compare(deck_2, threshold+1) > threshold
+        diff = deck_1.compare(deck_2, threshold+1)
+        return diff > threshold, diff
