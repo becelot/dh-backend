@@ -24,6 +24,7 @@ class DevelopmentConfig(Config):
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI: str = 'postgresql://postgres@127.0.0.1:5432/testdb'
     TWITCH_REDIRECT_URL: str = 'http://localhost:5000/api/auth/twitch_redirect'
+    TWITCH_CLIENT_SECRET: str = 'SomeVerySecretTwitchTvSecretString'
     DEBUG = True
     TESTING = True
 
