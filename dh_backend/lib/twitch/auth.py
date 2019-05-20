@@ -43,22 +43,22 @@ class TwitchOAuth(object):
         # first, check the state
         session = request.args.get('state')
         if not session:
-            return False, "Authorization failed. CSRF token was not provided."
+            return False, "CSRF token was not provided."
 
         twitch_session: TwitchSession = TwitchSession.query.filter_by(twitch_session_token=session).first()
         if not twitch_session:
-            return False, "Authorization failed. Invalid session."
+            return False, "Invalid session."
 
         # check if the error flag is set
         error = request.args.get('error')
         if error:
             message = request.args.get('error_description') if request.args.get('error_description')\
                 else 'Unspecified error.'
-            return False, f"Access Denied: {message}"
+            return False, f"{message} - Access denied"
 
         code = request.args.get('code')
         if not code:
-            return False, f"Authorization failed. Please try again later."
+            return False, f"TwitchAPI did not respond. Please try again later"
 
         # Get access token using the OAuth code retrieved
         req: requests.PreparedRequest = \
@@ -71,7 +71,7 @@ class TwitchOAuth(object):
                              f"&redirect_uri={self.api.redirect_url}")\
             .prepare()
 
-        response: requests.Response = requests.Session().send(req)
+            response: requests.Response = requests.Session().send(req)
 
         if response.status_code != 200:
             return False, "Could not acquire access token from Twitch"
