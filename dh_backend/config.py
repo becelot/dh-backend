@@ -12,6 +12,8 @@ class Config:
     DEBUG: bool = True
     TWITCH_CLIENT_ID: str = '3jqh17gag0ubkiz9h24z7gp5x3fd8e'
     TWITCH_CLIENT_SECRET: str = os.environ.get('TWITCH_CLIENT_SECRET')
+    TWITCH_HELIX_ENDPOINT: str = 'https://api.twitch.tv/helix/'
+    TWITCH_AUTHORIZATION_ENDPOINT: str = 'https://id.twitch.tv/oauth2/'
 
 
 class DevelopmentConfig(Config):
