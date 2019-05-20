@@ -61,20 +61,23 @@ class TwitchOAuth(object):
             return False, f"TwitchAPI did not respond. Please try again later"
 
         # Get access token using the OAuth code retrieved
-        req: requests.PreparedRequest = \
-            requests.Request('POST',
-                             f"{self.api.twitch_authorization_endpoint}token"
-                             f"?client_id={self.api.client_id}"
-                             f"&client_secret={self.api.client_secret}"
-                             f"&code={code}"
-                             "&grant_type=authorization_code"
-                             f"&redirect_uri={self.api.redirect_url}")\
-            .prepare()
+        try:
+            req: requests.PreparedRequest = \
+                requests.Request('POST',
+                                 f"{self.api.twitch_authorization_endpoint}token"
+                                 f"?client_id={self.api.client_id}"
+                                 f"&client_secret={self.api.client_secret}"
+                                 f"&code={code}"
+                                 "&grant_type=authorization_code"
+                                 f"&redirect_uri={self.api.redirect_url}")\
+                .prepare()
 
             response: requests.Response = requests.Session().send(req)
 
-        if response.status_code != 200:
-            return False, "Could not acquire access token from Twitch"
+            if response.status_code != 200:  # pragma: no cover
+                raise Exception("Could not acquire access token from Twitch")
+        except Exception as e:  # pragma: no cover
+            return False, str(e)
 
         # update the twitch session with the retrieved data
         twitch_session.access_token = response.json()['access_token']
