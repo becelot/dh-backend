@@ -18,12 +18,5 @@ class TwitchUsers(object):
             for user in users:
                 self._data.append(TwitchUser(user))
 
-    def __iter__(self) -> Generator[TwitchUser, None, None]:
-        # Yield available data
-        if self._data:
-            for entry in self._data:
-                yield entry
-            return
-
     def __getitem__(self, item: int) -> TwitchUser:
         return self._data[item]
