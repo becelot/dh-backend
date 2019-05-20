@@ -136,7 +136,7 @@ class UploadDeck(Resource):
 
         # First, check if the classes match
         if deck_1.get_hero_class() != deck_2.get_hero_class():
-            return True
+            return True, -1
 
         # if the decks differ in at most threshold cards
         diff = deck_1.compare(deck_2, threshold+1)
