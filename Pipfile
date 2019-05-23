@@ -24,6 +24,7 @@ hearthstone = "*"
 hearthstone-data = "*"
 requests = "*"
 pytest-responses = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"

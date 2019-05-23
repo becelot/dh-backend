@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d239b05e0c15ac42b0a9bf0edfbc948af24548f3d38e0bb27981a24f2bfe3ce7"
+            "sha256": "4ee5e3b1b0960c083044ecf89578bc7f70c515616d23781d297d4791c6c4742f"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -80,6 +80,14 @@
             "index": "pypi",
             "version": "==1.0.3"
         },
+        "flask-cors": {
+            "hashes": [
+                "sha256:7ad56ee3b90d4955148fc25a2ecaa1124fc84298471e266a7fea59aeac4405a5",
+                "sha256:7e90bf225fdf163d11b84b59fb17594d0580a16b97ab4e1146b1fb2737c1cfec"
+            ],
+            "index": "pypi",
+            "version": "==3.0.7"
+        },
         "flask-jwt-extended": {
             "hashes": [
                 "sha256:69d683b51cc85f3a0beb187787e8456a1cfe60e3f8d9da00dc0d7c34e38b698a"
@@ -89,11 +97,11 @@
         },
         "flask-migrate": {
             "hashes": [
-                "sha256:7dd4884825f19ffb2a6e6903c097674b0f6b7e826ec04f52a07fec477a711631",
-                "sha256:fb04c6ed9a198abebdc253f630c794ec4d63ce69fa9bc9c75d8c96cfa8afa43a"
+                "sha256:a08a92eaf2c5b1a49280bdc9faa1ac1d3538aeb65945adfdd45cc4789499b0d4",
+                "sha256:e2217ff18b98df27adbf6cc51eaa5f074c9e22f06074b47ebc7b29d2f545eccc"
             ],
             "index": "pypi",
-            "version": "==2.5.0"
+            "version": "==2.5.1"
         },
         "flask-restful": {
             "hashes": [
@@ -120,19 +128,19 @@
         },
         "hearthstone": {
             "hashes": [
-                "sha256:58d4566eb5dee97cd7198a61f41dae65159979a1d0e94ebc5762d2508e00106b",
-                "sha256:8e0548fa7565d91e2ec9dac67542a3dc66ec5a0a559ea5b62e934f4c3d433016"
+                "sha256:0f51ad585bc664c6c3dbec3b96759e15c15441e7c90389f5d9b31fa3ec62a905",
+                "sha256:9f4926465fa63f1ce98f4ab23e310df97f77635626f3c0b02f1fbd468089addd"
             ],
             "index": "pypi",
-            "version": "==5.6.0"
+            "version": "==5.6.1"
         },
         "hearthstone-data": {
             "hashes": [
-                "sha256:5d9c11cda5da1f8acf246972f66424de4aa7117689184cb845ae76907db49dad",
-                "sha256:fda5cdb7f016cb1451d6a7f7108105872fefcb6f53eea8c030134ff225558e7c"
+                "sha256:23b77fafb8dcfe41012a888c0d9fb31f05bf22333e936b34d631b3f2af254294",
+                "sha256:56c5601dd3a7386e26506b5a3df4a13eb23a130466c44122ea983108294542c2"
             ],
             "index": "pypi",
-            "version": "==30795.2"
+            "version": "==31022.1"
         },
         "idna": {
             "hashes": [

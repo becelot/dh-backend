@@ -1,6 +1,7 @@
 from typing import Type
 
 from flask import Flask
+from flask_cors import CORS
 from flask_restful import Api
 
 from dh_backend.config import Config, DevelopmentConfig, TestConfig
@@ -57,6 +58,7 @@ def create_app(*args, **kw):
     backend.load_resources()
     backend.add_auth()
     backend.add_twitch()
+    CORS(backend)
     return backend
 
 
