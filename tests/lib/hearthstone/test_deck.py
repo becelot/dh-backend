@@ -126,10 +126,10 @@ def test_get_cards_in_display_order():
         ("Sap", 1),
         ("Edwin VanCleef", 1),
         ("EVIL Miscreant", 2),
-        ("Raiding Party", 2),
         ("SI:7 Agent", 2),
         ("Dread Corsair", 2),
         ("Lifedrinker", 2),
+        ("Raiding Party", 2),
         ("Waggle Pick", 2),
         ("Captain Greenskin", 1),
         ("Leeroy Jenkins", 1),
@@ -139,5 +139,6 @@ def test_get_cards_in_display_order():
     real_cards = list(deck.get_cards_in_deck_order())
 
     for i in range(len(real_cards)):
+        print(real_cards[i][0].name)
         assert real_cards[i][0].name == deck_list[i][0]
         assert real_cards[i][1] == deck_list[i][1]
