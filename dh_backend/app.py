@@ -58,7 +58,7 @@ def create_app(*args, **kw):
     backend.load_resources()
     backend.add_auth()
     backend.add_twitch()
-    CORS(backend)
+    CORS(backend, resources={r"/api/*": {"origins": "*", "methods": 'GET,PUT,POST,DELETE'}})
     return backend
 
 
