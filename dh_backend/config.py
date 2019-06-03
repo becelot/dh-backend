@@ -33,6 +33,7 @@ class TestConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
+    TWITCH_REDIRECT_URL: str = os.environ.get('TWITCH_REDIRECT_URL')
     SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL')
     SECRET_KEY: str = os.environ.get('SECRET_KEY')
     JWT_SECRET_KEY: str = os.environ.get('JWT_SECRET_KEY')
