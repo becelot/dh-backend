@@ -25,6 +25,7 @@ hearthstone-data = "*"
 requests = "*"
 pytest-responses = "*"
 flask-cors = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
