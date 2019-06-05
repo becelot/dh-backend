@@ -18,7 +18,7 @@ def test_client_key_required(client: FlaskClient):
                            }),
                            content_type='application/json')
 
-    assert response.status_code == 400
+    assert response.json['status'] == 400
 
 
 def test_client_key_invalid(client: FlaskClient):
