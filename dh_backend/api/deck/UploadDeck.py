@@ -1,13 +1,59 @@
-from enum import IntEnum
+from datetime import datetime
+from enum import Enum, IntEnum
 from itertools import chain
 from typing import List, Optional, Iterable
 
+from flask import request
 from flask_restful import Resource
 from flask_restful import reqparse
+from marshmallow import Schema, fields, ValidationError
 from sqlalchemy import and_
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
 from dh_backend.models import User, Deck, DeckVersion, db
+
+
+class GameResult(Enum):
+    RESULT_UNKNOWN = 0
+    RESULT_LOSS = 1
+    RESULT_WIN = 2
+    RESULT_DRAW = 3
+
+
+class GameInformation(object):
+    def __init__(self, opponent_name: str, opponent_deck: str, time: datetime, result: GameResult):
+        self.opponent_name = opponent_name
+        self.opponent_deck = opponent_deck
+        self.time = time
+        self.result = result
+
+
+class GameInformationSchema(Schema):
+    opponent_name = fields.Str()
+    opponent_deck = fields.Str()
+    time = fields.DateTime()
+    result = fields.Int()
+
+    def load(self, *args, **kwargs) -> GameInformation:
+        return GameInformation(**super(GameInformationSchema, self).load(*args, **kwargs))
+
+
+class UploadDeckRequest(object):
+    def __init__(self, deckname: str, deckstring: str, client_key: str, game: GameInformationSchema = None):
+        self.deckname = deckname
+        self.deckstring = deckstring
+        self.client_key = client_key
+        self.game = game
+
+
+class UploadDeckRequestSchema(Schema):
+    deckname = fields.Str(required=True)
+    deckstring = fields.Str(required=True)
+    client_key = fields.Str(required=True)
+    game = fields.Nested(GameInformationSchema(), required=False)
+
+    def load(self, *args, **kwargs) -> UploadDeckRequest:
+        return UploadDeckRequest(**super(UploadDeckRequestSchema, self).load(*args, **kwargs))
 
 
 class DeckMatch(IntEnum):
@@ -18,7 +64,6 @@ class DeckMatch(IntEnum):
 
 class UploadDeck(Resource):
     """Upload a new deck to the database that the user is currently playing. Requires the user to be logged in!"""
-
     parser = reqparse.RequestParser()\
         .add_argument('deckname', type=str, location='json', required=True, help="Deckname is required") \
         .add_argument('deckstring', type=str, location='json', required=True, help="Deck code is required")\
@@ -32,16 +77,21 @@ class UploadDeck(Resource):
     """
     def post(self):
         """Upload a new deck to the tracker"""
-        args = UploadDeck.parser.parse_args()
+        try:
+            args: UploadDeckRequest = UploadDeckRequestSchema().load(request.json)
+        except ValidationError as err:
+            print('sdgw')
+            return {'status': 400, 'message': err.messages}
 
         # Get the identity of the uploader
-        client_key = args['client_key']
+        print(args)
+        client_key = str(args.client_key)
         user: User = User.query.filter_by(api_key=client_key).first()
         if user is None:
             return {'status': 401, 'message': 'The username could not be verified'}
 
         # Validate new deckcode
-        deckcode: str = args.get("deckstring")
+        deckcode: str = str(args.deckstring)
         try:
             new_deck: HearthstoneDeck = HearthstoneDeck.parse_deck(deckcode)
         except HSDeckParserException:
@@ -87,7 +137,7 @@ class UploadDeck(Resource):
             db.session.commit()
 
         # create a new version for the deck
-        version = DeckVersion(deck_name=args['deckname'], deck_code=deckcode, deck=deck_result)
+        version = DeckVersion(deck_name=args.deckname, deck_code=deckcode, deck=deck_result)
         db.session.add(version)
         db.session.commit()
 
