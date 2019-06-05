@@ -5,8 +5,8 @@ from dh_backend.models import db
 
 class GameResult(IntEnum):
     RESULT_UNKNOWN = 0
-    RESULT_LOSS = 1
-    RESULT_WIN = 2
+    RESULT_WIN = 1
+    RESULT_LOSS = 2
     RESULT_DRAW = 3
 
 
