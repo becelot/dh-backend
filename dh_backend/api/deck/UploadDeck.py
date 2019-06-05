@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum, IntEnum
+from enum import IntEnum
 from itertools import chain
 from typing import List, Optional, Iterable
 
@@ -11,13 +11,7 @@ from sqlalchemy import and_
 
 from dh_backend.lib.hearthstone.deck import HearthstoneDeck, HSDeckParserException
 from dh_backend.models import User, Deck, DeckVersion, db
-
-
-class GameResult(Enum):
-    RESULT_UNKNOWN = 0
-    RESULT_LOSS = 1
-    RESULT_WIN = 2
-    RESULT_DRAW = 3
+from dh_backend.models.Game import GameResult, Game
 
 
 class GameInformation(object):
@@ -129,6 +123,7 @@ class UploadDeck(Resource):
             user.recent_decks.set_recent_deck(deck_result)
             db.session.commit()
 
+            UploadDeck.upload_game(deck_result, args.game)
             return {'status': 200, 'message': 'Deck uploaded successfully'}
         elif deck_match == DeckMatch.NO_MATCH:
             # it is a completely new archetype that the user has not played before, create new deck
@@ -145,8 +140,27 @@ class UploadDeck(Resource):
         user.recent_decks.set_recent_deck(deck_result)
         db.session.commit()
 
+        UploadDeck.upload_game(deck_result, args.game)
+
         # and return success message
         return {'status': 200, 'message': 'Deck uploaded successfully'}
+
+    @staticmethod
+    def upload_game(deck: Deck, information: Optional[GameInformation]):
+        """If game information was provided, use it to update the decks score"""
+        if information is None:
+            return
+
+        game: Game = Game(
+            opponent_name=information.opponent_name,
+            opponent_deck=information.opponent_deck,
+            time=information.time,
+            result=information.result,
+            deck_version=deck.current_version
+        )
+
+        db.session.add(game)
+        db.session.commit()
 
     @staticmethod
     def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
