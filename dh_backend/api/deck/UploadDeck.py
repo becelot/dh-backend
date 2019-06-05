@@ -74,11 +74,9 @@ class UploadDeck(Resource):
         try:
             args: UploadDeckRequest = UploadDeckRequestSchema().load(request.json)
         except ValidationError as err:
-            print('sdgw')
             return {'status': 400, 'message': err.messages}
 
         # Get the identity of the uploader
-        print(args)
         client_key = str(args.client_key)
         user: User = User.query.filter_by(api_key=client_key).first()
         if user is None:
