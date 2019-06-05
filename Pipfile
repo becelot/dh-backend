@@ -26,6 +26,10 @@ requests = "*"
 pytest-responses = "*"
 flask-cors = "*"
 gunicorn = "*"
+marshmallow = "==3.0.0rc6"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
