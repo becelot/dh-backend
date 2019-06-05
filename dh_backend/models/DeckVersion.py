@@ -11,3 +11,5 @@ class DeckVersion(db.Model):
 
     deck_id = db.Column(db.Integer, db.ForeignKey("Deck.id"), nullable=False)
     deck = db.relationship("Deck", foreign_keys=[deck_id])
+
+    games = db.relationship('Game', back_populates='deck_version')

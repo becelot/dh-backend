@@ -6,6 +6,7 @@ from .DeckVersion import DeckVersion
 from .RecentDeck import RecentDeck
 from .TwitchSession import TwitchSession
 from .TwitchAccount import TwitchAccount
+from .Game import Game
 
 __all__ = [
     "db",
@@ -14,5 +15,6 @@ __all__ = [
     "DeckVersion",
     "RecentDeck",
     "TwitchSession",
-    "TwitchAccount"
+    "TwitchAccount",
+    "Game"
 ]
