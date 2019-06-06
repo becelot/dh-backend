@@ -160,6 +160,16 @@ class UploadDeck(Resource):
         db.session.add(game)
         db.session.commit()
 
+        if information.result == GameResult.RESULT_WIN:
+            deck.win_count += 1
+            deck.current_version.win_count += 1
+        elif information.result == GameResult.RESULT_LOSS:
+            deck.loss_count += 1
+            deck.current_version.loss_count += 1
+
+        db.session.commit()
+
+
     @staticmethod
     def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
         for deck in decks:
