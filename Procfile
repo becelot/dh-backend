@@ -1,1 +1,1 @@
-web: python manage.py db upgrade; python manage.py winloss; gunicorn run:application
+web: python manage.py db upgrade; gunicorn run:application
