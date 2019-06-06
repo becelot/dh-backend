@@ -9,6 +9,9 @@ class DeckVersion(db.Model):
     deck_name = db.Column(db.String(32), nullable=False)
     deck_code = db.Column(db.String, nullable=False)
 
+    loss_count = db.Column(db.Integer, default=0)
+    win_count = db.Column(db.Integer, default=0)
+
     deck_id = db.Column(db.Integer, db.ForeignKey("Deck.id"), nullable=False)
     deck = db.relationship("Deck", foreign_keys=[deck_id])
 

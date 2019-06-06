@@ -14,5 +14,8 @@ class Deck(db.Model):
                                                    foreign_keys=[current_version_id],
                                                    post_update=True)
 
+    loss_count = db.Column(db.Integer, default=0)
+    win_count = db.Column(db.Integer, default=0)
+
     versions = db.relationship("DeckVersion", primaryjoin="Deck.id==DeckVersion.deck_id", post_update=True,
                                cascade="all,delete", lazy="dynamic")
