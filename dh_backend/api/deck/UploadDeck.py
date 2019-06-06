@@ -169,7 +169,6 @@ class UploadDeck(Resource):
 
         db.session.commit()
 
-
     @staticmethod
     def find_similar_deck(new_deck: HearthstoneDeck, decks: Iterable[Deck]) -> (DeckMatch, Optional[Deck]):
         for deck in decks:
