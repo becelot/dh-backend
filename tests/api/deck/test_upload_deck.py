@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from flask.testing import FlaskClient
 
-from dh_backend.models import RecentDeck, User
+from dh_backend.models import RecentDeck, User, Deck
 from dh_backend.models.Game import GameResult, Game
 from tests.data.decks import TokenDruid, SilencePriest, MurlocShaman, EvenWarlock, SummonMage, SecretPaladin, \
     PirateRogue, TokenDruid2, SummonMage2, SecretMage, TokenDruidMalfurion
@@ -245,3 +245,53 @@ def test_game_upload(client: FlaskClient, db_session):
 
     assert len(db_session.query(Game).all()) == 1
     assert db_session.query(Game).first().deck_version.deck.user.user_name == user.user_name
+    assert db_session.query(Deck).first().win_count == 1
+    assert db_session.query(Deck).first().loss_count == 0
+    assert db_session.query(Deck).first().current_version.win_count == 1
+    assert db_session.query(Deck).first().current_version.loss_count == 0
+
+    response = client.post('/api/deck/upload',
+                           data=json.dumps({
+                               'deckname': 'Test deck',
+                               'deckstring': TokenDruid,
+                               'client_key': user.api_key,
+                               'game': {
+                                   'opponent_name': 'Jackson Man',
+                                   'opponent_deck': '',
+                                   'time': str(datetime.now()),
+                                   'result': GameResult.RESULT_WIN
+                               }
+                           }),
+                           content_type='application/json')
+
+    assert response.json['status'] == 200
+
+    assert len(db_session.query(Game).all()) == 2
+    assert db_session.query(Game).first().deck_version.deck.user.user_name == user.user_name
+    assert db_session.query(Deck).first().win_count == 2
+    assert db_session.query(Deck).first().loss_count == 0
+    assert db_session.query(Deck).first().current_version.win_count == 2
+    assert db_session.query(Deck).first().current_version.loss_count == 0
+
+    response = client.post('/api/deck/upload',
+                           data=json.dumps({
+                               'deckname': 'Test deck',
+                               'deckstring': TokenDruid,
+                               'client_key': user.api_key,
+                               'game': {
+                                   'opponent_name': 'Jackson Man',
+                                   'opponent_deck': '',
+                                   'time': str(datetime.now()),
+                                   'result': GameResult.RESULT_LOSS
+                               }
+                           }),
+                           content_type='application/json')
+
+    assert response.json['status'] == 200
+
+    assert len(db_session.query(Game).all()) == 3
+    assert db_session.query(Game).first().deck_version.deck.user.user_name == user.user_name
+    assert db_session.query(Deck).first().win_count == 2
+    assert db_session.query(Deck).first().loss_count == 1
+    assert db_session.query(Deck).first().current_version.win_count == 2
+    assert db_session.query(Deck).first().current_version.loss_count == 1
