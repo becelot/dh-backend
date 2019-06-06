@@ -33,7 +33,7 @@ class GameInformationSchema(Schema):
 
 
 class UploadDeckRequest(object):
-    def __init__(self, deckname: str, deckstring: str, client_key: str, game: GameInformationSchema = None):
+    def __init__(self, deckname: str, deckstring: str, client_key: str, game: GameInformation = None):
         self.deckname = deckname
         self.deckstring = deckstring
         self.client_key = client_key
@@ -115,10 +115,12 @@ class UploadDeck(Resource):
 
         # try to find deck in existing ones
         deck_match, deck_result = UploadDeck.find_similar_deck(new_deck, decks_iterator)
+        last_played = args.game.time if args.game is not None else datetime.now()
 
         # an exact match was found
         if deck_match == DeckMatch.EXACT_MATCH:
             user.recent_decks.set_recent_deck(deck_result)
+            deck_result.current_version.last_played = last_played
             db.session.commit()
 
             UploadDeck.upload_game(deck_result, args.game)
@@ -136,6 +138,7 @@ class UploadDeck(Resource):
 
         deck_result.current_version = version
         user.recent_decks.set_recent_deck(deck_result)
+        deck_result.current_version.last_played = datetime.now()
         db.session.commit()
 
         UploadDeck.upload_game(deck_result, args.game)
