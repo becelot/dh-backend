@@ -12,7 +12,9 @@ class Recent(Resource):
         if deck and deck.current_version:
             response.append({
                 'name': deck.current_version.deck_name,
-                'code': deck.current_version.deck_code
+                'code': deck.current_version.deck_code,
+                'wins': deck.current_version.win_count,
+                'loss': deck.current_version.loss_count
             })
 
     def get(self, channel_id: str):
