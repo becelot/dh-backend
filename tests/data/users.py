@@ -40,7 +40,7 @@ def test_user():
 
 def test_users(n: int = 50):
     fake = Faker(locale="de-DE")
-    fake.seed(1234)
+    Faker.seed(1234)
 
     users = []
     for i in range(n):
