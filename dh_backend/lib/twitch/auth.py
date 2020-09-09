@@ -58,7 +58,7 @@ class TwitchOAuth(object):
 
         code = request.args.get('code')
         if not code:
-            return False, f"TwitchAPI did not respond. Please try again later"
+            return False, "TwitchAPI did not respond. Please try again later"
 
         # Get access token using the OAuth code retrieved
         try:
