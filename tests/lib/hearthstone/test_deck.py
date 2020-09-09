@@ -140,6 +140,7 @@ def test_get_cards_in_display_order():
 
     for i in range(len(real_cards)):
         print(real_cards[i][0].name)
+        print(deck_list[i][0].name)
         # TODO: Fix this later
         # assert real_cards[i][0].name == deck_list[i][0]
         # assert real_cards[i][1] == deck_list[i][1]
